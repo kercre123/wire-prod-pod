@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Wire-Pod Interface</title>
+	<link rel="stylesheet" type="text/css" href="css/style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+  <div id="outer">
+    <div id="content" class="">
+	<img src="img/WirePodLogo.jpg" />	
+    <h2>Wire-Pod Installation UI</h2>
+	<p>It is recommended you read <a href="https://github.com/kercre123/wire-pod/blob/main/README.md" target="_blank">README.md</a></p>
+	<p>if you have configured everything here, just click the start button to start the installation</p>
+	<p>If you are unsure what to do, just select the recommended option.</p>	
+    <hr>
+	<a href="/index.html">Back</a>
+    <h3>Installation settings</h3>
+        <form id="getStartSettings">
+			<h3>IP address or escapepod.local</h3>
+			<p></p>
+			<select name="hostnameSettings" id="hostnameSettings" form="hostnameSettings">
+				<option value="ip_address">IP Address (recommended for OSKR bots)</option>
+				<option value="escapepod_local">escapepod.local (recommended for production bots)</option>				
+			</select><br>	
+			<h3>Weather API</h3>
+			<p>Would you like to setup weather commands? This involves creating a free account at <a href="https://weatherapi.com/" target="_blank">weatherapi.com</a> and putting in your API key here. This is optional.</p>			
+            <label for="weatherSettings">Do you want to setup weather API?:</label>
+			<select name="weatherSettings" id="weatherSettings" form="weatherSettings">
+				<option value="weather_no">No</option>
+				<option value="weather_yes">Yes</option>
+			</select><br>
+            <div id="weatherAPIInput"></div>	
+			<h3>Knowledge Graph</h3>
+			<p>Would you like to setup Knowledge Graph ("I have a question")? This involves creating a free account at <a href="https://houndify.com/" target="_blank">houndify.com</a> and entering your Client Key and Client ID.<br /> Note: It may look like you only get a trial, but there is an actual free tier with 100 free requests per day.<br />This is optional.</p>			
+            <label for="knowledgeSettings">Do you want to setup Knowledge Graph?:</label>
+			<select name="knowledgeSettings" id="knowledgeSettings" form="knowledgeSettings">
+				<option value="houndify_no">No</option>
+				<option value="houndify_yes">Yes</option>
+			</select><br>
+            <div id="houndifyInput"></div>		
+			<h3>Temperature Unit</h3>
+			<p>What temperature unit would you like to use?</p>			
+            <label for="tempUnitSettings">Temperature Unit:</label>
+			<select name="tempUnitSettings" id="tempUnitSettings" form="tempUnitSettings">
+				<option value="tempUnitCelsius">Celsius</option>
+				<option value="tempUnitFahrenheit">Fahrenheit</option>
+			</select><br>			
+        </form>
+        <button onclick="doSomething()">Start</button>
+    <hr>
+    
+</div>	
+</div>
+</body>
+<script src=""></script>
+</html>
