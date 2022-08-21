@@ -1,15 +1,9 @@
 #!/bin/bash
+	export CGO_LDFLAGS="-L/root/.coqui/"
+	export CGO_CXXFLAGS="-I/root/.coqui/"
+	export LD_LIBRARY_PATH="/root/.coqui/:$LD_LIBRARY_PATH"
 UNAME=$(uname -a)
 echo "Building chipper..."
-if [[ "${UNAME}" == *"aarch64"* ]]; then
-   ARCH=arm64
-elif [[ "${UNAME}" == *"armv7l"* ]]; then
-   ARCH=arm
-elif [[ "${UNAME}" == *"x86_64"* ]]; then
-   ARCH=amd64
-fi
-CGO_ENABLED=1 GOOS=linux GOARCH=${ARCH} /usr/local/go/bin/go build \
--ldflags "-w -s -extldflags "-static"" \
--trimpath \
--o chipper cmd/main.go
+/usr/local/go/bin/go build cmd/main.go
+mv main chipper
 echo "Built chipper!"

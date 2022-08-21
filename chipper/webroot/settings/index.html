@@ -15,6 +15,11 @@
 	<p>If you are unsure what to do, just select the recommended options.</p>	
     <hr>
 	<a href="/index.html">Back</a>
+	<h3>Management</h3>
+	<button onclick="startChipper()">Start wire-pod</button>
+	<button onclick="stopChipper()">Stop wire-pod</button>
+	<button onclick="restartChipper()">Restart wire-pod</button>
+	<br>
     <h3>Installation settings</h3>
         <form id="getStartSettings">
 			<h3>Hostname</h3>
@@ -22,7 +27,7 @@
 			<select name="hostnameSettings" id="hostnameSettings" form="hostnameSettings">
 				<option value="escapepod_local">escapepod.local (recommended for production bots)</option>
 				<option value="ip_address">IP Address (recommended for OSKR bots)</option>		
-			</select><br>	
+			</select><br>
 			<h3>Weather API</h3>
 			<p>Would you like to setup weather commands? This involves creating a free account at <a href="https://weatherapi.com/" target="_blank">weatherapi.com</a> and putting in your API key here. This is optional.</p>			
             <label for="weatherSettings">Do you want to setup weather API?:</label>
@@ -50,7 +55,7 @@
 			<label for="botIP">Enter your bot's IP address:</label>
 			<input type="text" id="botIP" name="botIP">
 		</form>		
-		<button onlick="setupBot()">Setup Bot</button>
+		<button onclick="setupBot()">Setup Bot</button>
     <hr>
     
 </div>	
