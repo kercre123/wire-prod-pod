@@ -38,10 +38,10 @@ if [[ $EUID -ne 0 ]]; then
 	exit 1
 fi
 
-if [[ ! -d ./chipper ]]; then
-	echo "Script is not running in the wire-pod/ directory or chipper folder is missing. Exiting."
-	exit 1
-fi
+#if [[ ! -d ./chipper ]]; then
+#	echo "Script is not running in the wire-pod/ directory or chipper folder is missing. Exiting."
+#	exit 1
+#fi
 
 if [[ $1 != "-f" ]]; then
 	if [[ ${ARCH} == "x86_64" ]]; then
@@ -218,13 +218,10 @@ function generateCerts() {
 	echo "1: IP address (recommended for OSKR Vectors)"
 	echo "2: Domain"
 	echo "3: escapepod.local (recommended for prod Vectors)"
-	IPDNSPrompt
+	isEscapePod=$2
 	if [[ ${isEscapePod} != "epod" ]]; then
-		if [[ ${SANPrefix} == "IP" ]]; then
-			IPPrompt
-		else
-			DNSPrompt
-		fi
+		address=$(ip -4 addr | grep $(ip addr | awk '/state UP/ {print $2}' | sed 's/://g' | head -n1) | grep -oP '(?<=inet\s)\d+(\.\d+){3}')
+		SANPrefix="IP"
 		rm -f ./chipper/useepod
 		rm -rf ./certs
 		mkdir certs
@@ -699,6 +696,11 @@ fi
 # echo "6: Just create source.sh file and config for bot (also for setting up weather API)"
 # echo "If you have done everything you have needed, run './setup.sh scp vectorip path/to/key' to copy the new vic-cloud and server config to Vector."
 # echo
+if [[ $1 == "certs" ]]; then
+	cd ..
+	generateCerts
+else
 		getPackages
 		getSTT
 		setupSystemd
+fi

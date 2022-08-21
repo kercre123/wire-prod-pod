@@ -11,6 +11,7 @@ import (
 	"os/signal"
 	"strconv"
 	"strings"
+	"syscall"
 
 	pb "github.com/digital-dream-labs/api/go/chipperpb"
 	"github.com/digital-dream-labs/chipper/pkg/logger"
@@ -36,8 +37,6 @@ type chipperConfigStruct struct {
 	HoundifyEnable string `json:"houndifyEnable"`
 	HoundifyKey    string `json:"houndifyKey"`
 	HoundifyID     string `json:"houndifyID"`
-	STTService     string `json:"sttService"`
-	PicovoiceKey   string `json:"picovoiceKey"`
 }
 
 func chipperAPIHandler(w http.ResponseWriter, r *http.Request) {
@@ -74,21 +73,34 @@ func chipperAPIHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	case r.URL.Path == "/chipper/make_config":
 		port := r.FormValue("port")
-		cert := r.FormValue("cert")
-		key := r.FormValue("key")
+		certType := r.FormValue("certType")
 		weatherEnable := r.FormValue("weatherEnable")
 		weatherKey := r.FormValue("weatherKey")
 		weatherUnit := r.FormValue("weatherUnit")
 		houndifyEnable := r.FormValue("houndifyEnable")
 		houndifyKey := r.FormValue("houndifyKey")
 		houndifyID := r.FormValue("houndifyID")
-		if port == "" && cert == "" && key == "" {
-			fmt.Fprintf(w, "port, cert, and key are required form values")
-		}
 		var chipperConfigReq chipperConfigStruct
 		chipperConfigReq.Port = port
-		chipperConfigReq.Cert = cert
-		chipperConfigReq.Key = key
+		if strings.Contains(certType, "epod") {
+			_, err := os.Create("./useepod")
+			if err != nil {
+				logger.Logger(err)
+			}
+			cmdOutput, _ := exec.Command("/bin/bash", "../setup.sh", "certs", "epod").Output()
+			logger.Logger(cmdOutput)
+			chipperConfigReq.Cert = "./epod/ep.crt"
+			chipperConfigReq.Key = "./epod/ep.key"
+		} else {
+			err := os.Remove("./useepod")
+			if err != nil {
+				logger.Logger(err)
+			}
+			cmdOutput, _ := exec.Command("/bin/bash", "../setup.sh", "certs", "ip").Output()
+			logger.Logger(cmdOutput)
+			chipperConfigReq.Cert = "../certs/cert.crt"
+			chipperConfigReq.Key = "../certs/cert.key"
+		}
 		chipperConfigReq.WeatherEnable = weatherEnable
 		chipperConfigReq.WeatherKey = weatherKey
 		chipperConfigReq.WeatherUnit = weatherUnit
@@ -101,8 +113,7 @@ func chipperAPIHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	case r.URL.Path == "/chipper/edit_config":
 		port := r.FormValue("port")
-		cert := r.FormValue("cert")
-		key := r.FormValue("key")
+		certType := r.FormValue("certType")
 		weatherEnable := r.FormValue("weatherEnable")
 		weatherKey := r.FormValue("weatherKey")
 		weatherUnit := r.FormValue("weatherUnit")
@@ -118,11 +129,26 @@ func chipperAPIHandler(w http.ResponseWriter, r *http.Request) {
 		if port != "" {
 			chipperConfigReq.Port = port
 		}
-		if cert != "" {
-			chipperConfigReq.Cert = cert
-		}
-		if key != "" {
-			chipperConfigReq.Key = key
+		if certType != "" {
+			if strings.Contains(certType, "epod") {
+				_, err := os.Create("./useepod")
+				if err != nil {
+					logger.Logger(err)
+				}
+				cmdOutput, _ := exec.Command("/bin/bash", "../setup.sh", "certs", "epod").Output()
+				logger.Logger(cmdOutput)
+				chipperConfigReq.Cert = "./epod/ep.crt"
+				chipperConfigReq.Key = "./epod/ep.key"
+			} else {
+				err := os.Remove("./useepod")
+				if err != nil {
+					logger.Logger(err)
+				}
+				cmdOutput, _ := exec.Command("/bin/bash", "../setup.sh", "certs", "ip").Output()
+				logger.Logger(cmdOutput)
+				chipperConfigReq.Cert = "../certs/cert.crt"
+				chipperConfigReq.Key = "../certs/cert.key"
+			}
 		}
 		if weatherEnable != "" {
 			chipperConfigReq.WeatherEnable = weatherEnable
@@ -160,8 +186,22 @@ func chipperAPIHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	case r.URL.Path == "/chipper/setup_bot":
 		botIP := r.FormValue("botIP")
+		var serverConfig string
+		if _, err := os.Stat("./useepod"); err == nil {
+			serverConfig = `{"jdocs": "jdocs.api.anki.com:443", "tms": "token.api.anki.com:443", "chipper": "escapepod.local:443", "check": "conncheck.global.anki-services.com/ok", "logfiles": "s3://anki-device-logs-prod/victor", "appkey": "oDoa0quieSeir6goowai7f"}`
+		} else {
+			ipAddrBytes, err := os.ReadFile("../certs/address")
+			if err != nil {
+				fmt.Fprintf(w, err.Error())
+				return
+			}
+			ipAddr := strings.TrimSpace(string(ipAddrBytes))
+			serverConfig = `{"jdocs": "jdocs.api.anki.com:443", "tms": "token.api.anki.com:443", "chipper": "` + ipAddr + `:` + os.Getenv("DDL_RPC_PORT") + `, "check": "conncheck.global.anki-services.com/ok", "logfiles": "s3://anki-device-logs-prod/victor", "appkey": "oDoa0quieSeir6goowai7f"}`
+		}
+		os.WriteFile("../certs/server_config.json", []byte(serverConfig), 0644)
 		if _, err := os.Stat("/tmp/sshKey"); err != nil {
-			fmt.Fprintf(w, "upload an ssh key first")
+			cmdOutput, _ := exec.Command("/bin/bash", "./setupBot.sh", botIP).Output()
+			fmt.Fprintf(w, "Output: "+string(cmdOutput))
 			return
 		}
 		cmdOutput, _ := exec.Command("/bin/bash", "./setupBot.sh", botIP, "/tmp/sshKey").Output()
@@ -292,10 +332,10 @@ func startServer() {
 			server.WithIntentGraphProcessor(p),
 		)
 		c := make(chan os.Signal, 1)
-		signal.Notify(c, os.Interrupt)
+		signal.Notify(c, os.Interrupt, syscall.SIGABRT, syscall.SIGINT, syscall.SIGTERM)
 		go func() {
 			for range c {
-				logger.Logger("Interrupt detected, exiting")
+				logger.Logger("Exiting")
 				os.Exit(0)
 			}
 		}()

@@ -21,14 +21,7 @@ cd wire-prod-pod
 sudo ./setup.sh
 ```
 
-To start chipper, run:
-
-```
-cd chipper
-sudo ./start.sh
-```
-
-wire-prod-pod will open a webserver for configuration at port 8080. Open a web browser and go to `http://localhost:8080` if you are using the same machine that is running wire-prod-pod. If you are not on the same machine, go to `http://machine_ip:8080`, replacing `machine_ip` with the machine's IP address. With a Raspberry Pi, going to `http://raspberrypi.local:8080` may work.
+wire-prod-pod will run as a daemon by default and it will open a webserver for configuration at port 8080. Open a web browser and go to `http://localhost:8080` if you are using the same machine that is running wire-prod-pod. If you are not on the same machine, go to `http://machine_ip:8080`, replacing `machine_ip` with the machine's IP address. With a Raspberry Pi, going to `http://raspberrypi.local:8080` may work.
 
 After all of that, try a voice command.
 
