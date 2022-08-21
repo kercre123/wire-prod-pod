@@ -86,7 +86,8 @@ function setupPod() {
     xhr.send();
     xhr.onload = function() {
         console.log(xhr.response)
-        alert("Success! You are ready to start wire-pod.")
+        restartChipperNoAlert()
+        alert("Success! wire-pod has started successfully.")
     }   
     return
 }
@@ -121,6 +122,16 @@ function restartChipper() {
     xhr.onload = function() {
         console.log(xhr.response)
         alert(xhr.response)
+    }   
+}
+
+function restartChipperNoAlert() {
+    let xhr = new XMLHttpRequest();
+    xhr.open("GET", "/chipper/restart_chipper");
+    xhr.setRequestHeader("Cache-Control", "no-cache, no-store, max-age=0");
+    xhr.send();
+    xhr.onload = function() {
+        console.log(xhr.response)
     }   
 }
 
