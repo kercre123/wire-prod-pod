@@ -1,12 +1,8 @@
-# wire-pod
+# wire-prod-pod
 
 This repo contains a custom Vector escape pod made from [chipper](https://github.com/digital-dream-labs/chipper) and [vector-cloud](https://github.com/digital-dream-labs/vector-cloud).
 
-## Program Descriptions
-
-`chipper` - Chipper is a program used on Digital Dream Lab's servers which takes in a Vector's voice stream, puts it into a speech-to-text processor, and spits out an intent.
-
-`vector-cloud` - Vector-cloud is the program which runs on Vector himself which uploads the mic stream to a chipper instance. This repo contains a fork of vector-cloud which has been modified to allow for a custom CA cert.
+This fork contains a different idea for how the voice server is managed. The webserver is what will manage the voice server.
 
 ## Configuring, Building, Installing
 
@@ -20,8 +16,8 @@ TODO: simplify all this to one bash command
 
 ```
 cd ~
-git clone https://github.com/kercre123/wire-pod.git
-cd wire-pod
+git clone https://github.com/kercre123/wire-prod-pod.git
+cd wire-prod-pod
 sudo ./setup.sh
 ```
 
@@ -32,15 +28,15 @@ cd chipper
 sudo ./start.sh
 ```
 
-Wire-pod will open a webserver for configuration at port 8080. Open a web browser and go to `http://localhost:8080` if you are using the same machine that is running wire-pod. If you are not on the same machine, go to `http://machine_ip:8080`, replacing `machine_ip` with the machine's IP address. With a Raspberry Pi, going to `http://raspberrypi.local:8080` may work.
+wire-prod-pod will open a webserver for configuration at port 8080. Open a web browser and go to `http://localhost:8080` if you are using the same machine that is running wire-prod-pod. If you are not on the same machine, go to `http://machine_ip:8080`, replacing `machine_ip` with the machine's IP address. With a Raspberry Pi, going to `http://raspberrypi.local:8080` may work.
 
 After all of that, try a voice command.
 
 #### Update
 
-To update to a newer version of wire-pod, make sure chipper is not running then run:
+To update to a newer version of wire-prod-pod, make sure chipper is not running then run:
 ```
-cd ~/wire-pod
+cd ~/wire-prod-pod
 sudo git pull
 cd chipper
 sudo ./start.sh
@@ -75,7 +71,7 @@ Architecture support:
 - arm64/aarch64
 - armv7l/arm32 (picovoice only)
 
-Things wire-pod has worked on:
+Things wire-prod-pod has worked on:
 
 - Raspberry Pi 4B+ 4GB RAM with Raspberry Pi OS
 	- Must be 64-bit OS if using Coqui
