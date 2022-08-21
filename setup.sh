@@ -162,6 +162,7 @@ function getSTT() {
 		cd "${origDir}"
 		mkdir -p stt
 		cd stt
+		if [[ ! -f completed ]]; then
 		if [[ -f model.scorer ]]; then
 			rm -rf ./*
 		fi
@@ -169,6 +170,7 @@ function getSTT() {
 			wget -O model.tflite -q --show-progress https://coqui.gateway.scarf.sh/english/coqui/v1.0.0-huge-vocab/model.tflite
 			echo "Getting STT scorer..."
 			wget -O model.scorer -q --show-progress https://coqui.gateway.scarf.sh/english/coqui/v1.0.0-huge-vocab/huge-vocabulary.scorer
+		fi
 		echo
 		touch completed
 		echo "STT assets successfully downloaded!"
@@ -570,6 +572,9 @@ function setupSystemd() {
 	systemctl daemon-reload
 	systemctl enable wire-pod
 	systemctl start wire-pod
+	echo
+	IPADDRESS=$(ip -4 addr | grep $(ip addr | awk '/state UP/ {print $2}' | sed 's/://g' | head -n1) | grep -oP '(?<=inet\s)\d+(\.\d+){3}')
+	echo "This part of setup is now complete! To set up the rest of wire-pod, open up http://${IPADDRESS}:8080 in a browser."
 #	DIRECTORY=$(readlink -f ./)
 #	echo "${DIRECTORY}"
 #	sudo git config --global --add safe.directory "${DIRECTORY}"
