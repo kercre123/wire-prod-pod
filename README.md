@@ -47,7 +47,7 @@ ota-start http://173.20.162.183:81/escapepod-prod-1.8.ota
 
 Only do one of the following sets of instructions.
 
-#### Raspberry Pi 4
+#### Option one: Raspberry Pi 4
 
 1. Download and install [Raspberry Pi Imager](https://www.raspberrypi.com/software/), insert a micro-SD card into your computer/into a reader
 
@@ -73,7 +73,7 @@ wget -O - https://wire.my.to/setup-wire-pod.sh | bash
 
 8. Voice commands should now work!
 
-### Any Linux system
+#### Option two: (almost) Any Linux system
 
 (Your distribution must have either pacman, dnf, or apt, make sure you have ports 443 and 8080 open)
 
