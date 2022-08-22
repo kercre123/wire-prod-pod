@@ -575,28 +575,28 @@ function setupSystemd() {
 	echo
 	IPADDRESS=$(ip -4 addr | grep $(ip addr | awk '/state UP/ {print $2}' | sed 's/://g' | head -n1) | grep -oP '(?<=inet\s)\d+(\.\d+){3}')
 	echo "This part of setup is now complete! To set up the rest of wire-pod, open up http://${IPADDRESS}:8080 in a browser."
-#	DIRECTORY=$(readlink -f ./)
-#	echo "${DIRECTORY}"
-#	sudo git config --global --add safe.directory "${DIRECTORY}"
-#	echo
-#	echo "systemd service has been installed and enabled! The service is called wire-pod.service"
-#	echo
-#	echo "Then, to see logs, run 'journalctl -fe | grep start.sh'"
-#	echo "[Unit]" >wire-pod-updater.service
-#        echo "Description=Wire Escape Pod (coqui)" >>wire-pod-updater.service
-#        echo >>wire-pod-updater.service
-#        echo "[Service]" >>wire-pod-updater.service
-#        echo "Type=simple" >>wire-pod-updater.service
-#        echo "WorkingDirectory=$(readlink -f ./)" >>wire-pod-updater.service
-#        echo "ExecStart=$(readlink -f ./update.sh)" >>wire-pod-updater.service
-#        echo >>wire-pod-updater.service
-#        echo "[Install]" >>wire-pod-updater.service
-#        echo "WantedBy=multi-user.target" >>wire-pod-updater.service
-#        mv wire-pod-updater.service /lib/systemd/system/
-#        systemctl daemon-reload
-#        systemctl enable wire-pod-updater
-#        systemctl start wire-pod-updater
-#	echo "Installed wire-pod-updater"
+	DIRECTORY=$(readlink -f ./)
+	echo "${DIRECTORY}"
+	git config --global --add safe.directory "${DIRECTORY}"
+	echo
+	echo "systemd service has been installed and enabled! The service is called wire-pod.service"
+	echo
+	echo "Then, to see logs, run 'journalctl -fe | grep start.sh'"
+	echo "[Unit]" >wire-pod-updater.service
+        echo "Description=Wire Escape Pod Updater (coqui)" >>wire-pod-updater.service
+        echo >>wire-pod-updater.service
+        echo "[Service]" >>wire-pod-updater.service
+        echo "Type=simple" >>wire-pod-updater.service
+        echo "WorkingDirectory=$(readlink -f ./)" >>wire-pod-updater.service
+        echo "ExecStart=$(readlink -f ./update.sh) -d" >>wire-pod-updater.service
+        echo >>wire-pod-updater.service
+        echo "[Install]" >>wire-pod-updater.service
+        echo "WantedBy=multi-user.target" >>wire-pod-updater.service
+        mv wire-pod-updater.service /lib/systemd/system/
+        systemctl daemon-reload
+        systemctl enable wire-pod-updater
+        systemctl start wire-pod-updater
+	echo "Installed wire-pod-updater"
 }
 
 function disableSystemd() {

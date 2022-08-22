@@ -8,7 +8,7 @@ fi
 if [[ $1 == "-d" ]]; then
 while true; do
 systemctl stop wire-pod
-git pull
+sudo git pull --force
 cd chipper
 sudo ./build.sh
 cd ..
@@ -16,11 +16,11 @@ echo
 systemctl start wire-pod
 echo "Updated!"
 echo
-sleep 600
+sleep 86400
 done
 else
 systemctl stop wire-pod
-git pull
+sudo git pull --force
 cd chipper
 sudo ./build.sh
 cd ..
