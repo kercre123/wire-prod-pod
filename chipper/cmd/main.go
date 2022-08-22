@@ -271,6 +271,7 @@ func main() {
 
 func stopServer() {
 	srv.Stop()
+	logger.Logger("Server stopped.")
 	grpcIsRunning = false
 }
 

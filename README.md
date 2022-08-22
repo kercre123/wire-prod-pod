@@ -22,7 +22,7 @@ Custom Vector escape pod for regular production Vectors. No OSKR required.
 
 ### Set up the bot
 
-1.	Put your Vector on the charger and hold the button for 15 seconds. The light will turn off after ~5 seconds, that is normal. Just keep holding until he turns back on (do *NOT* clear user data!).
+1.	Put your Vector on the charger and hold the button for 15 seconds. The light will turn off after ~5 seconds, that is normal. Just keep holding until he turns back on (This is not the same as clearing user data. Do *NOT* clear user data).
 
 2.	He should be at a screen that shows `anki.com/v`. On a computer with Bluetooth support (preferably Windows or macOS), go to [https://www.project-victor.org/noflow-devsetup](https://www.project-victor.org/noflow-devsetup) in a Chrome browser and connect to Vector like it tells you to. Do not check `Enable auto-setup flow`.
 	-	You may need to reload the page a few times for it to connect correctly
@@ -40,6 +40,7 @@ wifi-connect "ssid" "password"
 ```
 ota-start http://173.20.162.183:81/escapepod-prod-1.8.ota
 ```
+	-	If it disconnects in the middle of the download (you can tell by the `[####]` being replaced by just `$`), do not reconnect. The bot is still downloading it and will reboot automatically after a while.
 
 5.	Wait for that to finish. Once he has rebooted, continue on to the next set of instructions.
 
@@ -95,7 +96,7 @@ systemctl enable avahi-daemon
 wget -O - https://wire.my.to/setup-wire-pod.sh | bash
 ```
 
-4. Once that has completed, go to the URL it tells you to go to in a browser and click on `Set up wire-pod (API keys, STT service, etc)`. From there, follow the instructions. It should then be set up.
+4. Once that has completed, go to [http://escapepod:8080](http://escapepod:8080) in a browser and click on `Set up wire-pod (API keys, STT service, etc)`. From there, follow the instructions. It should then be set up and voice commands should now work on Vector.
 
 ## Updating
 
