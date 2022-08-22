@@ -51,7 +51,7 @@ Only do one of the following sets of instructions.
 
 1. Download and install [Raspberry Pi Imager](https://www.raspberrypi.com/software/), insert a micro-SD card into your computer/into a reader
 
-2. Follow along with this video. This is an example of how I would set it up for my network/liking. The only things you should change are the user password (located under `pi`, change it to anything you want and make sure you remember it) and the network information (you should put your network name instead of `AnkiRobits`, your network password instead of `KlaatuBaradaNikto!`)
+2. Follow along with [this video](https://www.youtube.com/watch?v=PUNcRqgt1cA). This is an example of how I would set it up for my network/liking. The only things you should change are the user password (located under `pi`, change it to anything you want and make sure you remember it) and the network information (you should put your network name instead of `AnkiRobits`, your network password instead of `KlaatuBaradaNikto!`)
 
 3. Insert the SD card into your Pi, wait a few minutes for it to boot up
 
