@@ -573,8 +573,8 @@ function setupSystemd() {
 	systemctl enable wire-pod
 	systemctl start wire-pod
 	echo
-	IPADDRESS=$(ip -4 addr | grep $(ip addr | awk '/state UP/ {print $2}' | sed 's/://g' | head -n1) | grep -oP '(?<=inet\s)\d+(\.\d+){3}')
-	echo "This part of setup is now complete! To set up the rest of wire-pod, open up http://${IPADDRESS}:8080 in a browser."
+	#IPADDRESS=$(ip -4 addr | grep $(ip addr | awk '/state UP/ {print $2}' | sed 's/://g' | head -n1) | grep -oP '(?<=inet\s)\d+(\.\d+){3}')
+	#echo "This part of setup is now complete! To set up the rest of wire-pod, open up http://${IPADDRESS}:8080 in a browser."
 	DIRECTORY=$(readlink -f ./)
 	echo "${DIRECTORY}"
 	git config --global --add safe.directory "${DIRECTORY}"
@@ -597,6 +597,11 @@ function setupSystemd() {
         systemctl enable wire-pod-updater
         systemctl start wire-pod-updater
 	echo "Installed wire-pod-updater"
+	echo
+	echo
+	echo
+        IPADDRESS=$(ip -4 addr | grep $(ip addr | awk '/state UP/ {print $2}' | sed 's/://g' | head -n1) | grep -oP '(?<=inet\s)\d+(\.\d+){3}')
+        echo "Wire-pod is now running! To set up the rest of wire-pod, open up http://${IPADDRESS}:8080 in a browser."
 }
 
 function disableSystemd() {
