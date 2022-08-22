@@ -1,26 +1,115 @@
 # wire-prod-pod
 
-This repo contains a custom Vector escape pod made from [chipper](https://github.com/digital-dream-labs/chipper) and [vector-cloud](https://github.com/digital-dream-labs/vector-cloud).
+Custom Vector escape pod for regular production Vectors. No OSKR required.
 
-This fork contains a different idea for how the voice server is managed. The webserver is what will manage the voice server.
+## Installation
 
-## Configuring, Building, Installing
+### Some general notices:
 
-(NOTE: If you want to setup a production Vector, use [these instructions](/ProductionVectorInstructions.md))
+-   This will require you to put your Vector on 1.8. You cannot keep him on 1.6 if you want to use these instructions.
+-   This will NOT clear user data, and the Vector SDK should work just fine.
+-   It is recommended you use a Raspberry Pi 4, though you can use any Linux computer
+-   For this; you do not need to pay for the voice subscription, Escape Pod, or any DDL service.
 
-### Linux
+### Prerequisites
 
-(Your distribution must have either pacman, dnf, or apt)
+-   Raspberry Pi capable of running 64-bit Raspberry Pi OS
+	-	A standard computer running Linux works too. There will be two sets of instructions for whichever you choose
+-   A production Vector 1.0 that has already been setup like normal (no subscription required, he should just be active)
+	-	Vector 2.0 is not supported yet
+-   A computer with Google Chrome and Bluetooth
+	-	If you are using Linux, go to [chrome://flags](chrome://flags) and enable `Experimental web platform features`, then relaunch Chrome
 
-Open a terminal and run this command:
+### Set up the bot
 
-`curl -sSL https://wire.my.to/setup-wire-pod.sh | bash`
+1.	Put your Vector on the charger and hold the button for 15 seconds. The light will turn off after ~5 seconds, that is normal. Just keep holding until he turns back on (do *NOT* clear user data!).
 
-Once that has completed, go to the URL it tells you to go to in a browser and click on `Set up wire-pod (API keys, STT service, etc)`. From there, do the instructions it tells you to do. It should then be set up.
+2.	He should be at a screen that shows `anki.com/v`. On a computer with Bluetooth support (preferably Windows or macOS), go to [https://www.project-victor.org/noflow-devsetup](https://www.project-victor.org/noflow-devsetup) in a Chrome browser and connect to Vector like it tells you to. Do not check `Enable auto-setup flow`.
+	-	You may need to reload the page a few times for it to connect correctly
+	-	If you are using Linux, you may need to open up Bluetooth settings and keep it discovering in the background
 
-#### Updating
+3.	You should now be at a terminal-like interface. In that interface, connect Vector to Wi-Fi with this command: 
+```
+wifi-connect "ssid" "password"
+```
+	-	Replace `ssid` with your network name, `password` with the network password
+	-	Example: `wifi-connect "AnkiRobits" "KlaatuBaradaNikto!"`
 
-This creates an updater daemon which runs once a day.
+4.	Enter the following command into the site: 
+```
+ota-start http://173.20.162.183:81/escapepod-prod-1.8.ota
+```
+
+5.	Wait for that to finish. Once he has rebooted, continue on to the next set of instructions.
+
+### Set up wire-pod
+
+Only do one of the following sets of instructions.
+
+#### Raspberry Pi 4
+
+1. Download and install [Raspberry Pi Imager](https://www.raspberrypi.com/software/), insert a micro-SD card into your computer/into a reader
+
+2. Follow along with this video. This is an example of how I would set it up for my network/liking. The only things you should change are the user password (located under `pi`, change it to anything you want and make sure you remember it) and the network information (you should put your network name instead of `AnkiRobits`, your network password instead of `KlaatuBaradaNikto!`)
+
+3. Insert the SD card into your Pi, wait a few minutes for it to boot up
+
+4. On your computer, open up a Terminal (or Powershell on Windows) and run the following command:
+
+```
+ssh pi@escapepod
+```
+
+5. If it gives you a prompt, enter `yes`. Then enter in the user password you chose in Raspberry Pi Imager (under `pi`)
+
+6. The terminal should show `pi@escapepod ~ $`. If you are there, run the following command:
+
+```
+wget -O - https://wire.my.to/setup-wire-pod.sh | bash
+```
+
+7. After that completes, open a browser and go to [http://escapepod:8080](http://escapepod:8080). From there, click on "Set up wire-pod" and do as it says. You do not need to do the part at the bottom where it says `Choose file`, that is reserved for OSKR/dev bots.
+
+8. Voice commands should now work!
+
+### Any Linux system
+
+(Your distribution must have either pacman, dnf, or apt, make sure you have ports 443 and 8080 open)
+
+1. Open a terminal
+
+2. Use the following commands to change your hostname to `escapepod` (this will change your computer's name and reboot your computer):
+
+```
+sudo -s
+echo escapepod > /etc/hostname
+reboot
+```
+
+3. Open a terminal and run this command:
+
+```
+wget -O - https://wire.my.to/setup-wire-pod.sh | bash
+```
+
+4. Once that has completed, go to the URL it tells you to go to in a browser and click on `Set up wire-pod (API keys, STT service, etc)`. From there, do the instructions it tells you to do. It should then be set up.
+
+If it is not working, try opening a terminal and running:
+
+`sudo systemctl start avahi-daemon`
+
+If it works after that, run:
+
+`sudo systemctl enable avahi-daemon`
+
+## Updating
+
+Wire-pod auto-updates once a day. To force an update, run the following commands:
+
+```
+cd ~/wire-prod-pod
+sudo ./update.sh
+```
 
 ## Web interface
 
@@ -29,7 +118,7 @@ Chipper hosts a web interface at port 8080. This can be used to create custom in
 To get to it, open a browser and go to `http://serverip:8080`, replacing serverip with the IP address of the machine running the chipper server. If you are running the browser on the machine running chipper, you can go to `http://localhost:8080`
 
 - Set up wire-pod
-	- This is where you would enter your API keys for Houndify or weatherAPI if you want to set those up.
+	- This is where you would enter your API keys for [Houndify](https://www.houndify.com/dashboard) and [WeatherAPI](https://www.weatherapi.com/) if you want to set those up.
 - Configure user settings
 	- Custom intents
 		- Example: You want to create a custom intent that allows Vector to turn the lights off. The transcribed text that matches to this intent should include "lights off" and other variations like "lid off" for better detection. It will execute a python script located in your user directory called `vlight.py`. It should be launched with the `off` variable because the lights are being turned off. This script turns the lights off and connects to Vector so he says "The lights are off!". You have multiple bots registered with the SDK so a serial number must be specified. After the SDK program is complete, chipper should send `intent_greeting_goodnight`. The following screenshot is a correct configuration for this case. The `Add intent` button would be pressed after everything is put in.
