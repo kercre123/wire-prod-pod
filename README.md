@@ -79,13 +79,15 @@ wget -O - https://wire.my.to/setup-wire-pod.sh | bash
 
 1. Open a terminal
 
-2. Use the following commands to change your hostname to `escapepod` (this will change your computer's name and reboot your computer):
+2. Use the following commands to change your hostname to `escapepod` and have that register with the network (this will change your computer's name):
 
 ```
-sudo -s
-echo escapepod > /etc/hostname
-reboot
+sudo hostnamectl set-hostname escapepod
+systemctl restart avahi-daemon
+systemctl enable avahi-daemon
 ```
+
+(ignore any errors that may pop up, they are normal)
 
 3. Open a terminal and run this command:
 
@@ -93,15 +95,7 @@ reboot
 wget -O - https://wire.my.to/setup-wire-pod.sh | bash
 ```
 
-4. Once that has completed, go to the URL it tells you to go to in a browser and click on `Set up wire-pod (API keys, STT service, etc)`. From there, do the instructions it tells you to do. It should then be set up.
-
-If it is not working, try opening a terminal and running:
-
-`sudo systemctl start avahi-daemon`
-
-If it works after that, run:
-
-`sudo systemctl enable avahi-daemon`
+4. Once that has completed, go to the URL it tells you to go to in a browser and click on `Set up wire-pod (API keys, STT service, etc)`. From there, follow the instructions. It should then be set up.
 
 ## Updating
 
