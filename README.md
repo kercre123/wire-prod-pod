@@ -12,28 +12,15 @@ This fork contains a different idea for how the voice server is managed. The web
 
 (Your distribution must have either pacman, dnf, or apt)
 
-TODO: simplify all this to one bash command
+Open a terminal and run this command:
 
-```
-cd ~
-git clone https://github.com/kercre123/wire-prod-pod.git
-cd wire-prod-pod
-sudo ./setup.sh
-```
+`curl -sSL https://wire.my.to/setup-wire-pod.sh | bash`
 
-wire-prod-pod will run as a daemon by default and it will open a webserver for configuration at port 8080. Open a web browser and go to `http://localhost:8080` if you are using the same machine that is running wire-prod-pod. If you are not on the same machine, go to `http://machine_ip:8080`, replacing `machine_ip` with the machine's IP address. With a Raspberry Pi, going to `http://raspberrypi.local:8080` may work.
+Once that has completed, go to the URL it tells you to go to in a browser and click on `Set up wire-pod (API keys, STT service, etc)`. From there, do the instructions it tells you to do. It should then be set up.
 
-After all of that, try a voice command.
+#### Updating
 
-#### Update
-
-To update to a newer version of wire-prod-pod, make sure chipper is not running then run:
-```
-cd ~/wire-prod-pod
-sudo git pull
-cd chipper
-sudo ./start.sh
-```
+This creates an updater daemon which runs once a day.
 
 ## Web interface
 
@@ -41,13 +28,18 @@ Chipper hosts a web interface at port 8080. This can be used to create custom in
 
 To get to it, open a browser and go to `http://serverip:8080`, replacing serverip with the IP address of the machine running the chipper server. If you are running the browser on the machine running chipper, you can go to `http://localhost:8080`
 
-- Custom intents
-	- Example: You want to create a custom intent that allows Vector to turn the lights off. The transcribed text that matches to this intent should include "lights off" and other variations like "lid off" for better detection. It will execute a python script located in your user directory called `vlight.py`. It should be launched with the `off` variable because the lights are being turned off. This script turns the lights off and connects to Vector so he says "The lights are off!". You have multiple bots registered with the SDK so a serial number must be specified. After the SDK program is complete, chipper should send `intent_greeting_goodnight`. The following screenshot is a correct configuration for this case. The `Add intent` button would be pressed after everything is put in.
-	- ![Custom Intent Screenshot](./images/customIntent.png)
-	- (If `!botSerial` is put into the program arguments, chipper will substitute it for the serial number of the bot that is making a request to it.)
-- Bot configurations
-	- Example: You have a bot on 1.6 with a serial number of 0060059b; located in Des Moines, Iowa; and you would like to use Fahrenheit for the temperature unit in the weather command. The following screenshot is a correct configuration for that bot. Once that is input, you would press "Add bot". It would then be registered with chipper.
-	- ![Bot Configuration Screenshot](./images/botConfig.png)
+- Set up wire-pod
+	- This is where you would enter your API keys for Houndify or weatherAPI if you want to set those up.
+- Configure user settings
+	- Custom intents
+		- Example: You want to create a custom intent that allows Vector to turn the lights off. The transcribed text that matches to this intent should include "lights off" and other variations like "lid off" for better detection. It will execute a python script located in your user directory called `vlight.py`. It should be launched with the `off` variable because the lights are being turned off. This script turns the lights off and connects to Vector so he says "The lights are off!". You have multiple bots registered with the SDK so a serial number must be specified. After the SDK program is complete, chipper should send `intent_greeting_goodnight`. The following screenshot is a correct configuration for this case. The `Add intent` button would be pressed after everything is put in.
+		- ![Custom Intent Screenshot](./images/customIntent.png)
+		- (If `!botSerial` is put into the program arguments, chipper will substitute it for the serial number of the bot that is making a request to it.)
+	- Bot configurations
+		- Example: You have a bot on 1.6 with a serial number of 0060059b; located in Des Moines, Iowa; and you would like to use Fahrenheit for the temperature unit in the weather command. The following screenshot is a correct configuration for that bot. Once that is input, you would press "Add bot". It would then be registered with chipper.
+		- ![Bot Configuration Screenshot](./images/botConfig.png)
+- See logs
+	- This shows the logs produced by wire-pod. Updates every 200ms, shows the last 30 lines.
 
 ## Status
 
@@ -73,10 +65,6 @@ Things wire-prod-pod has worked on:
 - Desktop with Ryzen 5 3600, 16 GB RAM with Ubuntu 22.04
 - Laptop with mobile i7
 - Desktop with Xeon X5650
-- Android Devices
-	- Pixel 4, Note 4, Razer Phone, Oculus Quest 2, OnePlus 7 Pro, Moto G6, Pixel 2
-	- [Termux](https://github.com/termux/termux-app) proot-distro: Use Ubuntu, make sure to use a port above 1024 and not the default 443.
-	- Linux Deploy: Works stock, just make sure to choose the arch that matches your device in settings. Also use a bigger image size, at least 3 GB.
 
 General notes:
 

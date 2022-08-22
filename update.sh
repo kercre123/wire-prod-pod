@@ -6,6 +6,7 @@ if [[ ! -d ./chipper ]]; then
 fi
 
 if [[ $1 == "-d" ]]; then
+sleep 20
 while true; do
 systemctl stop wire-pod
 sudo git pull --force
