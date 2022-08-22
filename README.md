@@ -40,7 +40,7 @@ wifi-connect "ssid" "password"
 ```
 ota-start http://173.20.162.183:81/escapepod-prod-1.8.ota
 ```
-	-	If it disconnects in the middle of the download (you can tell by the `[####]` being replaced by just `$`), do not reconnect. The bot is still downloading it and will reboot automatically after a while.
+-	If it disconnects in the middle of the download (you can tell by the `[####]` being replaced by just `$`), do not reconnect. The bot is still downloading it and will reboot automatically after a while.
 
 5.	Wait for that to finish. Once he has rebooted, continue on to the next set of instructions.
 
@@ -84,8 +84,8 @@ wget -O - https://wire.my.to/setup-wire-pod.sh | bash
 
 ```
 sudo hostnamectl set-hostname escapepod
-systemctl restart avahi-daemon
-systemctl enable avahi-daemon
+sudo systemctl restart avahi-daemon
+sudo systemctl enable avahi-daemon
 ```
 
 (ignore any errors that may pop up, they are normal)
