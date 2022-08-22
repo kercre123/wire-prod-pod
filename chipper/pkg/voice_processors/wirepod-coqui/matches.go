@@ -45,7 +45,7 @@ var shutUpList = []string{"shut up"}
 var helloList = []string{"hello", "are you", "high", "below", "little", "follow", "for you", "far you"}
 var comeList = []string{"come", "to me"}
 var loveList = []string{"love", "dove"}
-var questionList = []string{"question", "weston"}
+var questionList = []string{"ques", "weston"}
 var checkTimerList = []string{"check timer", "check the timer", "check the time her", "check time her",
 	"check time her", "check time of her", "checked the timer", "checked the time her", "checked the time of her"}
 var stopTimerList = []string{"up the timer", "stop timer", "stop clock", "stop be", "stopped t", "stopped be", "stopped at", "stop the"}
