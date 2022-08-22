@@ -211,15 +211,15 @@ function DNSPrompt() {
 }
 
 function generateCerts() {
-	echo
+	#echo
 	echo "Creating certificates"
-	echo
-	echo "Would you like to use your IP address or a domain for the Subject Alt Name?"
-	echo "Or would you like to use the escapepod.local certs?"
-	echo
-	echo "1: IP address (recommended for OSKR Vectors)"
-	echo "2: Domain"
-	echo "3: escapepod.local (recommended for prod Vectors)"
+	#echo
+	#echo "Would you like to use your IP address or a domain for the Subject Alt Name?"
+	#echo "Or would you like to use the escapepod.local certs?"
+	#echo
+	#echo "1: IP address (recommended for OSKR Vectors)"
+	#echo "2: Domain"
+	#echo "3: escapepod.local (recommended for prod Vectors)"
 	isEscapePod=$2
 	if [[ ${isEscapePod} != "epod" ]]; then
 		address=$(ip -4 addr | grep $(ip addr | awk '/state UP/ {print $2}' | sed 's/://g' | head -n1) | grep -oP '(?<=inet\s)\d+(\.\d+){3}')
@@ -256,7 +256,7 @@ function generateCerts() {
 		echo
 		cd ..
 	else
-		echo
+	#	echo
 		echo "escapepod.local chosen."
 		touch chipper/useepod
 	fi

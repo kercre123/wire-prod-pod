@@ -82,7 +82,7 @@ func chipperAPIHandler(w http.ResponseWriter, r *http.Request) {
 		houndifyID := r.FormValue("houndifyID")
 		var chipperConfigReq chipperConfigStruct
 		chipperConfigReq.Port = port
-		if strings.Contains(certType, "epod") {
+		if certType == "epod" {
 			_, err := os.Create("./useepod")
 			if err != nil {
 				logger.Logger(err)

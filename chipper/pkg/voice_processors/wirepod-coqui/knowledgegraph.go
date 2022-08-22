@@ -33,6 +33,7 @@ func ParseSpokenResponse(serverResponseJSON string) (string, error) {
 }
 
 func InitHoundify() {
+	houndEnable = true
 	if os.Getenv("HOUNDIFY_CLIENT_ID") == "" {
 		logger.Logger("Houndify Client ID not provided.")
 		houndEnable = false
