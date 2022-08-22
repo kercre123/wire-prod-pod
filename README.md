@@ -29,11 +29,12 @@ Custom Vector escape pod for regular production Vectors. No OSKR required.
 	-	If you are using Linux, you may need to open up Bluetooth settings and keep it discovering in the background
 
 3.	You should now be at a terminal-like interface. In that interface, connect Vector to Wi-Fi with this command: 
+
 ```
 wifi-connect "ssid" "password"
 ```
-	-	Replace `ssid` with your network name, `password` with the network password
-	-	Example: `wifi-connect "AnkiRobits" "KlaatuBaradaNikto!"`
+-	Replace `ssid` with your network name, `password` with the network password
+-	Example: `wifi-connect "AnkiRobits" "KlaatuBaradaNikto!"`
 
 4.	Enter the following command into the site: 
 ```
