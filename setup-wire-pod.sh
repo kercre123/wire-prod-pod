@@ -15,14 +15,14 @@ else
 fi
 
 if [[ ${TARGET} == "debian" ]]; then
-                apt update -y
-                apt install -y git
+                sudo apt update -y
+                sudo apt install -y git
 elif [[ ${TARGET} == "arch" ]]; then
-                pacman -Sy --noconfirm
+                sudo pacman -Sy --noconfirm
                 sudo pacman -S --noconfirm git
 elif [[ ${TARGET} == "fedora" ]]; then
-                dnf update
-                dnf install -y git
+                sudo dnf update
+                sudo dnf install -y git
 fi
 
 cd ~
