@@ -25,7 +25,7 @@
 		echo "The key that was provided was not found. Exiting."
 		exit 0
 	fi
-	ssh -i ${keyPath} root@${botAddress} "cat /build.prop" >/tmp/sshTest 2>>/tmp/sshTest
+	ssh -oStrictHostKeyChecking=no -o ConnectTimeout=5  -i ${keyPath} root@${botAddress} "cat /build.prop" >/tmp/sshTest 2>>/tmp/sshTest
 	botBuildProp=$(cat /tmp/sshTest)
     if [[ "${botBuildProp}" == *"no mutual signature"* ]]; then
 	    echo "PubkeyAcceptedKeyTypes +ssh-rsa" >>/etc/ssh/ssh_config
@@ -35,7 +35,7 @@
 		echo "Unable to communicate with robot. The key may be invalid, the bot may not be unlocked, or this device and the robot are not on the same network."
 		exit 0
 	fi
-	scp -oStrictHostKeyChecking=no -v -i ${keyPath} root@${botAddress}:/build.prop /tmp/scpTest >/tmp/scpTest 2>>/tmp/scpTest
+	scp -oStrictHostKeyChecking=no -o ConnectTimeout=5 -v -i ${keyPath} root@${botAddress}:/build.prop /tmp/scpTest >/tmp/scpTest 2>>/tmp/scpTest
 	scpTest=$(cat /tmp/scpTest)
 	if [[ "${scpTest}" == *"sftp"* ]]; then
 		oldVar="-O"

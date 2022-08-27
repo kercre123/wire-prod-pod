@@ -7,8 +7,10 @@ import (
 	"io"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
+	leopard "github.com/Picovoice/leopard/binding/go"
 	"github.com/asticode/go-asticoqui"
 	"github.com/digital-dream-labs/chipper/pkg/logger"
 	"github.com/digital-dream-labs/chipper/pkg/vtt"
@@ -73,6 +75,7 @@ func sttHandler(reqThing interface{}, isKnowledgeGraph bool) (transcribedString 
 	var transcribedText string = ""
 	var isOpus bool
 	var micData [][]byte
+	var micDataLeopard []int16
 	var die bool = false
 	var numInRange int = 0
 	var oldDataLength int = 0
@@ -83,6 +86,7 @@ func sttHandler(reqThing interface{}, isKnowledgeGraph bool) (transcribedString 
 	var inactiveNum int = 0
 	var deviceESN string
 	var deviceSession string
+	var leopardSTT leopard.Leopard
 	botNum = botNum + 1
 	justThisBotNum := botNum
 	if isKnowledgeGraph {
@@ -143,7 +147,7 @@ func sttHandler(reqThing interface{}, isKnowledgeGraph bool) (transcribedString 
 	logger.Logger("Processing...")
 	inactiveNumMax := 20
 	var coquiStream *asticoqui.Stream
-	if !isKnowledgeGraph {
+	if !isKnowledgeGraph && !usePicovoice {
 		coquiInstance, _ := asticoqui.New("../stt/model.tflite")
 		if _, err := os.Stat("../stt/large_vocabulary.scorer"); err == nil {
 			coquiInstance.EnableExternalScorer("../stt/large_vocabulary.scorer")
@@ -156,6 +160,16 @@ func sttHandler(reqThing interface{}, isKnowledgeGraph bool) (transcribedString 
 		micData = bytesToIntVAD(stream, data, die, isOpus)
 		for _, sample := range micData {
 			coquiStream.FeedAudioContent(bytesToSamples(sample))
+		}
+	}
+	if usePicovoice {
+		if botNum > picovoiceInstances {
+			fmt.Println("Too many bots are connected, sending error to bot " + strconv.Itoa(justThisBotNum))
+			//IntentPass(req, "intent_system_noaudio", "Too many bots, max is 5", map[string]string{"error": "EOF"}, true, justThisBotNum)
+			botNum = botNum - 1
+			return "", transcribedSlots, false, justThisBotNum, false, fmt.Errorf("Too many bots are connected, max is " + picovoiceInstancesOS)
+		} else {
+			leopardSTT = leopardSTTArray[botNum-1]
 		}
 	}
 	vad, err := webrtcvad.New()
@@ -267,6 +281,12 @@ func sttHandler(reqThing interface{}, isKnowledgeGraph bool) (transcribedString 
 					die = true
 				}
 			} else {
+				if usePicovoice {
+					transcribedTextPre, _, _ := leopardSTT.Process(micDataLeopard)
+					transcribedText = strings.ToLower(transcribedTextPre)
+					logger.Logger("Bot " + strconv.Itoa(justThisBotNum) + " Transcribed text: " + transcribedText)
+					die = true
+				}
 				transcribedText, _ = coquiStream.Finish()
 				logger.Logger("Bot " + strconv.Itoa(justThisBotNum) + " Transcribed text: " + transcribedText)
 				die = true

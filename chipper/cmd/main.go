@@ -37,6 +37,8 @@ type chipperConfigStruct struct {
 	HoundifyEnable string `json:"houndifyEnable"`
 	HoundifyKey    string `json:"houndifyKey"`
 	HoundifyID     string `json:"houndifyID"`
+	SttService     string `json:"sttService"`
+	PicovoiceKey   string `json:"picovoiceKey"`
 }
 
 func chipperAPIHandler(w http.ResponseWriter, r *http.Request) {
@@ -80,6 +82,8 @@ func chipperAPIHandler(w http.ResponseWriter, r *http.Request) {
 		houndifyEnable := r.FormValue("houndifyEnable")
 		houndifyKey := r.FormValue("houndifyKey")
 		houndifyID := r.FormValue("houndifyID")
+		sttService := r.FormValue("sttService")
+		picovoiceKey := r.FormValue("picovoiceKey")
 		var chipperConfigReq chipperConfigStruct
 		chipperConfigReq.Port = port
 		if certType == "epod" {
@@ -107,73 +111,13 @@ func chipperAPIHandler(w http.ResponseWriter, r *http.Request) {
 		chipperConfigReq.HoundifyEnable = houndifyEnable
 		chipperConfigReq.HoundifyKey = houndifyKey
 		chipperConfigReq.HoundifyID = houndifyID
+		chipperConfigReq.SttService = sttService
+		chipperConfigReq.PicovoiceKey = picovoiceKey
 		chipperConfigBytes, _ := json.Marshal(chipperConfigReq)
 		os.WriteFile("./chipperConfig.json", chipperConfigBytes, 0644)
 		fmt.Fprintf(w, "chipper config created")
 		return
-	case r.URL.Path == "/chipper/edit_config":
-		port := r.FormValue("port")
-		certType := r.FormValue("certType")
-		weatherEnable := r.FormValue("weatherEnable")
-		weatherKey := r.FormValue("weatherKey")
-		weatherUnit := r.FormValue("weatherUnit")
-		houndifyEnable := r.FormValue("houndifyEnable")
-		houndifyKey := r.FormValue("houndifyKey")
-		houndifyID := r.FormValue("houndifyID")
-		var chipperConfigReq chipperConfigStruct
-		chipperConfigOrig, err := os.ReadFile("./chipperConfig.json")
-		if err != nil {
-			fmt.Fprint(w, err.Error())
-		}
-		json.Unmarshal(chipperConfigOrig, &chipperConfigReq)
-		if port != "" {
-			chipperConfigReq.Port = port
-		}
-		if certType != "" {
-			if strings.Contains(certType, "epod") {
-				_, err := os.Create("./useepod")
-				if err != nil {
-					logger.Logger(err)
-				}
-				cmdOutput, _ := exec.Command("/bin/bash", "../setup.sh", "certs", "epod").Output()
-				logger.Logger(cmdOutput)
-				chipperConfigReq.Cert = "./epod/ep.crt"
-				chipperConfigReq.Key = "./epod/ep.key"
-			} else {
-				err := os.Remove("./useepod")
-				if err != nil {
-					logger.Logger(err)
-				}
-				cmdOutput, _ := exec.Command("/bin/bash", "../setup.sh", "certs", "ip").Output()
-				logger.Logger(cmdOutput)
-				chipperConfigReq.Cert = "../certs/cert.crt"
-				chipperConfigReq.Key = "../certs/cert.key"
-			}
-		}
-		if weatherEnable != "" {
-			chipperConfigReq.WeatherEnable = weatherEnable
-		}
-		if weatherKey != "" {
-			chipperConfigReq.WeatherKey = weatherKey
-		}
-		if weatherUnit != "" {
-			chipperConfigReq.WeatherUnit = weatherUnit
-		}
-		if houndifyEnable != "" {
-			chipperConfigReq.HoundifyEnable = houndifyEnable
-		}
-		if houndifyKey != "" {
-			chipperConfigReq.HoundifyKey = houndifyKey
-		}
-		if houndifyID != "" {
-			chipperConfigReq.HoundifyID = houndifyID
-		}
-		chipperConfigBytes, _ := json.Marshal(chipperConfigReq)
-		os.WriteFile("./chipperConfig.json", chipperConfigBytes, 0644)
-		fmt.Fprintf(w, "chipper config edited")
-		return
 	case r.URL.Path == "/chipper/upload_ssh_key":
-		r.ParseMultipartForm(32 << 20)
 		var buf bytes.Buffer
 		file, _, err := r.FormFile("file")
 		if err != nil {
@@ -295,6 +239,8 @@ func startServer() {
 		os.Setenv("HOUNDIFY_CLIENT_KEY", chipperConfig.HoundifyKey)
 		os.Setenv("HOUNDIFY_CLIENT_ID", chipperConfig.HoundifyID)
 		os.Setenv("DEBUG_LOGGING", "true")
+		os.Setenv("STT_SERVICE", chipperConfig.SttService)
+		os.Setenv("PICOVOICE_APIKEY", chipperConfig.PicovoiceKey)
 	}
 	var err error
 	srv, err = grpcserver.New(

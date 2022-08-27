@@ -17,6 +17,25 @@ function showWeatherForm() {
     }
 }
 
+function showPicovoiceForm() {
+    var keyLabel = document.createElement("label")
+    keyLabel.innerHTML = "Enter your API key here: "
+    keyLabel.htmlFor = "picovoiceKey";
+    var keyForm = document.createElement("input")
+    keyForm.type = "text"
+    keyForm.id = "picovoiceKey"
+    keyForm.name = "picovoiceKey"
+    sttSelect = document.getElementById("sttSettings")
+    picovoiceKeyDiv = document.getElementById("picovoiceAPIInput")
+    if (sttSelect.value == "picovoice_leopard") {
+        picovoiceKeyDiv.innerHTML = ""
+        picovoiceKeyDiv.appendChild(keyLabel)
+        picovoiceKeyDiv.appendChild(keyForm)
+    } else {
+        picovoiceKeyDiv.innerHTML = ""
+    }
+}
+
 function showHoundForm() {
     var idLabel = document.createElement("label")
     idLabel.innerHTML = "Enter your Client ID here: "
@@ -55,6 +74,9 @@ function setupPod() {
     var weatherValue = document.getElementById("weatherSettings").value
     var weatherKey = ""
     var houndValue = document.getElementById("knowledgeSettings").value
+    var sttValue = document.getElementById("sttSettings").value
+    var sttSend = ""
+    var picovoiceKey = ""
     var houndID = ""
     var houndKey = ""
     if (weatherValue == "weather_yes") {
@@ -74,10 +96,20 @@ function setupPod() {
             return
         }
     }
+    if (sttValue == "picovoice_leopard") {
+        picovoiceKey = document.getElementById("picovoiceKey").value
+        if (picovoiceKey == "") {
+            alert("You must enter a Picovoice API key, or use Coqui instead.")
+            return
+        }
+        sttSend = "leopard"
+    } else {
+        sttSend = "coqui"
+    }
     if (hostnameValue == "escapepod_local"){
         certSend = "epod"
     }
-    var sendString = "?port=" + portSend + "&certType=" + certSend + "&weatherEnable=" + weatherSend + "&weatherKey=" + weatherKey + "&houndifyEnable=" + houndSend + "&houndifyID=" + houndID + "&houndifyKey=" + houndKey
+    var sendString = "?port=" + portSend + "&certType=" + certSend + "&weatherEnable=" + weatherSend + "&weatherKey=" + weatherKey + "&houndifyEnable=" + houndSend + "&houndifyID=" + houndID + "&houndifyKey=" + houndKey + "&sttService=" + sttSend + "&picovoiceKey=" + picovoiceKey
     console.log(sendString)
     let xhr = new XMLHttpRequest();
     xhr.open("GET", "/chipper/make_config" + sendString);
@@ -136,6 +168,32 @@ function restartChipperNoAlert() {
 }
 
 function setupBot() {
-    alert("This does not work at the moment!")
-    return
+    if (document.getElementById("botIP").value == "") {
+        alert("You must enter your bot's IP address. This can be found in CCIS (put Vector on the charger, double press his button, lift his lift up then down).")
+        return
+    }
+    let sshKey = document.getElementById("sshKeyfile").files[0];  // file from input
+    let req = new XMLHttpRequest();
+    let formData = new FormData();
+    formData.append("file", sshKey);                                
+    req.open("POST", "/chipper/upload_ssh_key");
+    req.send(formData);
+    let xhr = new XMLHttpRequest();
+    xhr.open("GET", "/chipper/setup_bot" + "?botIP=" + document.getElementById("botIP").value);
+    xhr.setRequestHeader("Cache-Control", "no-cache, no-store, max-age=0");
+    xhr.send();
+    xhr.onload = function() {
+        console.log(xhr.response)
+        responseString = xhr.response
+        if (responseString.includes("Unable to")) {
+            alert("Unable to communicate with robot. The key may be invalid, the bot may not be unlocked, or this device and the robot are not on the same network.")
+            return
+        } else if (responseString.includes("Success")) {
+            alert("Success! Voice commands should now be working with your bot.")
+            return
+        } else {
+            alert("Error: " + responseString)
+            return
+        }
+    }
 }
