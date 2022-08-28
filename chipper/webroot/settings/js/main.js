@@ -188,7 +188,7 @@ function setupBot() {
         if (responseString.includes("Unable to")) {
             alert("Unable to communicate with robot. The key may be invalid, the bot may not be unlocked, or this device and the robot are not on the same network.")
             return
-        } else if (responseString.includes("Success")) {
+        } else if (responseString.includes("Everything")) {
             alert("Success! Voice commands should now be working with your bot.")
             return
         } else {

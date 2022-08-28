@@ -30,6 +30,32 @@ func split(buf []byte) [][]byte {
 	return chunk
 }
 
+func bytesToSamples(buf []byte) []int16 {
+	samples := make([]int16, len(buf)/2)
+	for i := 0; i < len(buf)/2; i++ {
+		samples[i] = int16(binary.LittleEndian.Uint16(buf[i*2:]))
+	}
+	return samples
+}
+
+func bytesToIntLeopard(stream opus.OggStream, data []byte, die bool, isOpus bool) []int16 {
+	// detect if data is pcm or opus
+	if die {
+		return nil
+	}
+	if isOpus {
+		// opus
+		n, err := stream.Decode(data)
+		if err != nil {
+			fmt.Println(err)
+		}
+		return bytesToSamples(n)
+	} else {
+		// pcm
+		return bytesToSamples(data)
+	}
+}
+
 func bytesToIntVAD(stream opus.OggStream, data []byte, die bool, isOpus bool) [][]byte {
 	// detect if data is pcm or opus
 	if die {
@@ -50,14 +76,6 @@ func bytesToIntVAD(stream opus.OggStream, data []byte, die bool, isOpus bool) []
 	}
 }
 
-func bytesToSamples(buf []byte) []int16 {
-	samples := make([]int16, len(buf)/2)
-	for i := 0; i < len(buf)/2; i++ {
-		samples[i] = int16(binary.LittleEndian.Uint16(buf[i*2:]))
-	}
-	return samples
-}
-
 func sttHandler(reqThing interface{}, isKnowledgeGraph bool) (transcribedString string, slots map[string]string, isRhino bool, thisBotNum int, opusUsed bool, err error) {
 	var req2 *vtt.IntentRequest
 	var req1 *vtt.KnowledgeGraphRequest
@@ -75,7 +93,6 @@ func sttHandler(reqThing interface{}, isKnowledgeGraph bool) (transcribedString 
 	var transcribedText string = ""
 	var isOpus bool
 	var micData [][]byte
-	var micDataLeopard []int16
 	var die bool = false
 	var numInRange int = 0
 	var oldDataLength int = 0
@@ -226,7 +243,7 @@ func sttHandler(reqThing interface{}, isKnowledgeGraph bool) (transcribedString 
 		for _, sample := range micData {
 			if !speechDone {
 				if numInRange >= oldDataLength {
-					if !isKnowledgeGraph {
+					if !isKnowledgeGraph && !usePicovoice {
 						coquiStream.FeedAudioContent(bytesToSamples(sample))
 					}
 					active, err := vad.Process(16000, sample)
@@ -282,12 +299,11 @@ func sttHandler(reqThing interface{}, isKnowledgeGraph bool) (transcribedString 
 				}
 			} else {
 				if usePicovoice {
-					transcribedTextPre, _, _ := leopardSTT.Process(micDataLeopard)
+					transcribedTextPre, _, _ := leopardSTT.Process(bytesToIntLeopard(stream, data, die, isOpus))
 					transcribedText = strings.ToLower(transcribedTextPre)
-					logger.Logger("Bot " + strconv.Itoa(justThisBotNum) + " Transcribed text: " + transcribedText)
-					die = true
+				} else {
+					transcribedText, _ = coquiStream.Finish()
 				}
-				transcribedText, _ = coquiStream.Finish()
 				logger.Logger("Bot " + strconv.Itoa(justThisBotNum) + " Transcribed text: " + transcribedText)
 				die = true
 			}

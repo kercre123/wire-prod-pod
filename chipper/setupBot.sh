@@ -60,5 +60,3 @@
 	echo
 	echo "Everything has been copied to the bot! Voice commands should work now without needing to reboot Vector."
 	echo
-	echo "Everything is now setup! You should be ready to run chipper. sudo ./chipper/start.sh"
-	echo

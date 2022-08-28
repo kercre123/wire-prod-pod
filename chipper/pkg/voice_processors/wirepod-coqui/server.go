@@ -85,7 +85,7 @@ func New() (*Server, error) {
 				logger.Logger("You must set PICOVOICE_APIKEY to a value.")
 				return nil, nil
 			} else {
-				fmt.Println("PICOVOICE_APIKEY is not set, using LEOPARD_APIKEY")
+				logger.Logger("PICOVOICE_APIKEY is not set, using LEOPARD_APIKEY")
 				picovoiceKey = leopardKeyOS
 			}
 		} else {
@@ -93,7 +93,7 @@ func New() (*Server, error) {
 		}
 		logger.Logger("Initializing " + strconv.Itoa(picovoiceInstances) + " Picovoice Instances...")
 		for i := 0; i < picovoiceInstances; i++ {
-			fmt.Println("Initializing Picovoice Instance " + strconv.Itoa(i))
+			logger.Logger("Initializing Picovoice Instance " + strconv.Itoa(i))
 			leopardSTTArray = append(leopardSTTArray, leopard.Leopard{AccessKey: picovoiceKey})
 			leopardSTTArray[i].Init()
 		}

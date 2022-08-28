@@ -29,8 +29,8 @@
 			<h3>Hostname</h3>
 			<p>If you are setting this up for a production bot, you must choose escapepod.local. If you are setting up for OSKR/dev-only, IP address is recommended.</p>
 			<select name="hostnameSettings" id="hostnameSettings" form="hostnameSettings">
-				<option value="escapepod_local">escapepod.local (recommended for production bots)</option>
-				<option value="ip_address">IP Address (recommended for OSKR bots)</option>		
+				<option value="escapepod_local">escapepod.local (required for production bots)</option>
+				<option value="ip_address">IP Address (recommended for OSKR/dev bots)</option>		
 			</select><br>
 			<h3>Weather API</h3>
 			<p>Would you like to setup weather commands? This involves creating a free account at <a href="https://weatherapi.com/" target="_blank">weatherapi.com</a> and putting in your API key. This is optional.</p>			
@@ -53,9 +53,10 @@
 		<hr>
 		<h2>Set up OSKR/dev bot</h2>
 		<p>Once you have setup wire-pod, use this form to setup your OSKR/dev-unlocked bot. If you have a prod bot, skip this.</p>
+		<p>Setting the bot up should take about 10-20 seconds.</p>
 		<form id="setupBot">
 			<div id="setupBotOutput"></div>
-			<label for="sshKeyfile">Upload your bot's SSH key (not required if the bot is running WireOS):</label>
+			<label for="sshKeyfile">Upload your bot's SSH key:</label>
 			<input type="file" id="sshKeyfile" name="sshKeyfile">
 			<label for="botIP">Enter your bot's IP address:</label>
 			<input type="text" id="botIP" name="botIP">

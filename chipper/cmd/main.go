@@ -86,22 +86,14 @@ func chipperAPIHandler(w http.ResponseWriter, r *http.Request) {
 		picovoiceKey := r.FormValue("picovoiceKey")
 		var chipperConfigReq chipperConfigStruct
 		chipperConfigReq.Port = port
-		if certType == "epod" {
-			_, err := os.Create("./useepod")
-			if err != nil {
-				logger.Logger(err)
-			}
-			cmdOutput, _ := exec.Command("/bin/bash", "../setup.sh", "certs", "epod").Output()
-			if strings.Contains(string(cmdOutput), "Generating key and cert") {
-				logger.Logger("Successfully generated certs")
-			}
+		if strings.Contains(certType, "epod") {
+			logger.Logger("creating useepod")
+			os.WriteFile("./useepod", []byte("true"), 0644)
+			exec.Command("/bin/bash", "../setup.sh", "certs", "epod").Run()
 			chipperConfigReq.Cert = "./epod/ep.crt"
 			chipperConfigReq.Key = "./epod/ep.key"
 		} else {
-			err := os.Remove("./useepod")
-			if err != nil {
-				logger.Logger(err)
-			}
+			exec.Command("/bin/rm", "-f", "./useepod").Run()
 			cmdOutput, _ := exec.Command("/bin/bash", "../setup.sh", "certs", "ip").Output()
 			if strings.Contains(string(cmdOutput), "Generating key and cert") {
 				logger.Logger("Successfully generated certs")
@@ -144,7 +136,7 @@ func chipperAPIHandler(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 			ipAddr := strings.TrimSpace(string(ipAddrBytes))
-			serverConfig = `{"jdocs": "jdocs.api.anki.com:443", "tms": "token.api.anki.com:443", "chipper": "` + ipAddr + `:` + os.Getenv("DDL_RPC_PORT") + `, "check": "conncheck.global.anki-services.com/ok", "logfiles": "s3://anki-device-logs-prod/victor", "appkey": "oDoa0quieSeir6goowai7f"}`
+			serverConfig = `{"jdocs": "jdocs.api.anki.com:443", "tms": "token.api.anki.com:443", "chipper": "` + ipAddr + `:` + os.Getenv("DDL_RPC_PORT") + `", "check": "conncheck.global.anki-services.com/ok", "logfiles": "s3://anki-device-logs-prod/victor", "appkey": "oDoa0quieSeir6goowai7f"}`
 		}
 		os.WriteFile("../certs/server_config.json", []byte(serverConfig), 0644)
 		if _, err := os.Stat("/tmp/sshKey"); err != nil {
@@ -232,6 +224,9 @@ func startServer() {
 		certString := string(certBytes)
 		keyBytes, _ := os.ReadFile(chipperConfig.Key)
 		keyString := string(keyBytes)
+		if chipperConfig.Cert == "./epod/ep.crt" {
+			exec.Command("/bin/touch", "./useepod").Run()
+		}
 		os.Setenv("DDL_RPC_PORT", chipperConfig.Port)
 		os.Setenv("DDL_RPC_TLS_CERTIFICATE", certString)
 		os.Setenv("DDL_RPC_TLS_KEY", keyString)

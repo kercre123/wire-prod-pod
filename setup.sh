@@ -220,8 +220,7 @@ function generateCerts() {
 	#echo "1: IP address (recommended for OSKR Vectors)"
 	#echo "2: Domain"
 	#echo "3: escapepod.local (recommended for prod Vectors)"
-	isEscapePod=$2
-	if [[ ${isEscapePod} != "epod" ]]; then
+	if [[ "${isEscapePod}" != *"epod"* ]]; then
 		address=$(ip -4 addr | grep $(ip addr | awk '/state UP/ {print $2}' | sed 's/://g' | head -n1) | grep -oP '(?<=inet\s)\d+(\.\d+){3}')
 		SANPrefix="IP"
 		rm -f ./chipper/useepod
@@ -726,6 +725,7 @@ fi
 # echo
 if [[ $1 == "certs" ]]; then
 	cd ..
+	isEscapePod=$2
 	generateCerts
 else
 		getPackages
