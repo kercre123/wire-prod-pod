@@ -3,7 +3,7 @@ package wirepod
 // This is where you can add intents and more possible utterances for intents
 
 var meetVictorList = []string{"name is", "native is", "names", "name's"}
-var weatherList = []string{"weather", "whether", "the other", "the water", "no other"}
+var weatherList = []string{"weather", "whether", "the other", "the water", "no other", "the mother"}
 var nameAskList = []string{"my name"}
 var eyeColorList = []string{"eye color", "colo", "i call her", "i foller", "icolor", "ecce", "erior", "ichor", "agricola",
 	"change", "oracular", "oracle"}
