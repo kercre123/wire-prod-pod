@@ -9,18 +9,14 @@
   <div id="outer">
     <div id="content" class="">
 	<img src="img/WirePodLogo.jpg" />	
-    <h2>Wire-Pod Installation UI</h2>
+    <h1>Wire-Pod Installation</h1>
 	<p>It is recommended you read <a href="https://github.com/kercre123/wire-pod/blob/main/README.md" target="_blank">README.md</a></p>
-	<p>Once you have configured everything here, click the 'Setup wire-pod' button to start the installation.</p>
+	<p>Once you have configured everything here, click the 'Setup wire-pod' button to start the installation. That button will also restart (or start) wire-pod automatically.</p>
 	<p>If you are unsure what to do, just select the recommended options.</p>	
     <hr>
 	<a href="/index.html">Back</a>
-	<h3>Management</h3>
-	<button onclick="startChipper()">Start wire-pod</button>
-	<button onclick="stopChipper()">Stop wire-pod</button>
-	<button onclick="restartChipper()">Restart wire-pod</button>
 	<br>
-    <h3>Installation settings</h3>
+    <h2>Installation settings</h2>
         <form id="getStartSettings">
 			<h3>Speech-to-text service</h3>
 			<p>Wire-pod currently supports two STT (speech-to-text) services. The recommended/default one is Coqui, because it is completely local while still being accurate and speedy on most systems. The other option is Picovoice Leopard, which is more accurate and faster than Coqui, and is local, but usage is recorded on a server. To use Picovoice, you will have to create an account at <a href="https://console.picovoice.ai">Picovoice</a> and enter your API key.</p>
@@ -54,8 +50,8 @@
         </form>
         <button onclick="setupPod()">Setup wire-pod</button>
 		<hr>
+		<h2>Set up OSKR/dev bot</h2>
 		<p>Once you have setup wire-pod, use this form to setup your OSKR/dev-unlocked bot. If you have a prod bot, skip this.</p>
-		<p>This is currently not functional.</p>
 		<form id="setupBot">
 			<div id="setupBotOutput"></div>
 			<label for="sshKeyfile">Upload your bot's SSH key (not required if the bot is running WireOS):</label>

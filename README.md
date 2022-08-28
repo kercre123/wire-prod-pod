@@ -1,6 +1,6 @@
 # wire-prod-pod
 
-Custom Vector escape pod for regular production Vectors. No OSKR required.
+Custom Vector escape pod designed for regular production Vectors. No OSKR required.
 
 ## Installation
 
