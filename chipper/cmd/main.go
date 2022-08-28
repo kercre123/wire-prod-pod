@@ -92,7 +92,9 @@ func chipperAPIHandler(w http.ResponseWriter, r *http.Request) {
 				logger.Logger(err)
 			}
 			cmdOutput, _ := exec.Command("/bin/bash", "../setup.sh", "certs", "epod").Output()
-			logger.Logger(string(cmdOutput))
+			if strings.Contains(string(cmdOutput), "Generating key and cert") {
+				logger.Logger("Successfully generated certs")
+			}
 			chipperConfigReq.Cert = "./epod/ep.crt"
 			chipperConfigReq.Key = "./epod/ep.key"
 		} else {
@@ -101,7 +103,9 @@ func chipperAPIHandler(w http.ResponseWriter, r *http.Request) {
 				logger.Logger(err)
 			}
 			cmdOutput, _ := exec.Command("/bin/bash", "../setup.sh", "certs", "ip").Output()
-			logger.Logger(string(cmdOutput))
+			if strings.Contains(string(cmdOutput), "Generating key and cert") {
+				logger.Logger("Successfully generated certs")
+			}
 			chipperConfigReq.Cert = "../certs/cert.crt"
 			chipperConfigReq.Key = "../certs/cert.key"
 		}
