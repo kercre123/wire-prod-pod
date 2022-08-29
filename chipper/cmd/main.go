@@ -138,6 +138,7 @@ func chipperAPIHandler(w http.ResponseWriter, r *http.Request) {
 			ipAddr := strings.TrimSpace(string(ipAddrBytes))
 			serverConfig = `{"jdocs": "jdocs.api.anki.com:443", "tms": "token.api.anki.com:443", "chipper": "` + ipAddr + `:` + os.Getenv("DDL_RPC_PORT") + `", "check": "conncheck.global.anki-services.com/ok", "logfiles": "s3://anki-device-logs-prod/victor", "appkey": "oDoa0quieSeir6goowai7f"}`
 		}
+		exec.Command("/bin/mkdir", "-p", "../certs").Run()
 		os.WriteFile("../certs/server_config.json", []byte(serverConfig), 0644)
 		if _, err := os.Stat("/tmp/sshKey"); err != nil {
 			cmdOutput, _ := exec.Command("/bin/bash", "./setupBot.sh", botIP).Output()
