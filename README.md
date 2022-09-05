@@ -2,12 +2,15 @@
 
 Custom Vector escape pod designed for regular production Vectors. No OSKR required.
 
+This version is designed to be easy to setup by consumers and by people with little technical experience. If you would like a version that is more dev-friendly and customizable, check out [wire-pod](https://wwww.github.com/kercre123/wire-pod).
+
 ## Installation
 
-### Some general notices:
+### Some general notices for production Vectors:
 
 -   This will require you to put your Vector on 1.8. You cannot keep him on 1.6 if you want to use these instructions.
--   This will NOT clear user data, and the Vector SDK should work just fine.
+-   This will NOT clear user data.
+-	The SDK should work fine, though make sure you authenticate it before you setup wire-pod.
 -   It is recommended you use a Raspberry Pi 4, though you can use any Linux computer
 -   For this; you do not need to pay for the voice subscription, Escape Pod, or any DDL service.
 
@@ -17,34 +20,20 @@ Custom Vector escape pod designed for regular production Vectors. No OSKR requir
 	-	A standard computer running Linux works too. There will be two sets of instructions for whichever you choose
 -   A production Vector 1.0 that has already been setup like normal (no subscription required, he should just be active)
 	-	Vector 2.0 is not supported yet
--   A computer with Google Chrome and Bluetooth
+-   A computer with Google Chrome (or the new Microsoft Edge) and Bluetooth
 	-	If you are using Linux, go to [chrome://flags](chrome://flags) and enable `Experimental web platform features`, then relaunch Chrome
 
 ### Set up the bot
 
 1.	Put your Vector on the charger and hold the button for 15 seconds. The light will turn off after ~5 seconds, that is normal. Just keep holding until he turns back on (This is not the same as clearing user data. Do *NOT* clear user data).
 
-2.	He should be at a screen that shows `anki.com/v`. On a computer with Bluetooth support (preferably Windows or macOS), go to [https://www.project-victor.org/noflow-devsetup](https://www.project-victor.org/noflow-devsetup) in a Chrome browser and connect to Vector like it tells you to. Do not check `Enable auto-setup flow`.
-	-	You may need to reload the page a few times for it to connect correctly
-	-	If you are using Linux, you may need to open up Bluetooth settings and keep it discovering in the background
-
-3.	You should now be at a terminal-like interface. In that interface, connect Vector to Wi-Fi with this command: 
-
-```
-wifi-connect "ssid" "password"
-```
--	Replace `ssid` with your network name, `password` with the network password
--	Example: `wifi-connect "AnkiRobits" "KlaatuBaradaNikto!"`
-
-4.	Enter the following command into the site: 
-```
-ota-start http://173.20.162.183:81/escapepod-prod-1.8.ota
-```
--	If it disconnects in the middle of the download (you can tell by the `[####]` being replaced by just `$`), do not reconnect. The bot is still downloading it and will reboot automatically after a while.
+2.	He should be at a screen that shows `anki.com/v`. On a computer with Bluetooth support (preferably Windows or macOS), go to [https://www.project-victor.org/vector-epod-setup](https://www.project-victor.org/vector-epod-setup) in Chrome or Edge and follow the instructions. The download may take a few minutes to start.
 
 5.	Wait for that to finish. Once he has rebooted, continue on to the next set of instructions.
 
 ### Set up wire-pod
+
+wire-pod can be setup either on a Raspberry Pi, pretty much any Linux desktop, or on Windows 10/11 via WSL.
 
 Only do one of the following sets of instructions.
 
@@ -67,7 +56,7 @@ ssh pi@escapepod
 6. The terminal should show `pi@escapepod ~ $`. If you are there, run the following command:
 
 ```
-wget -O - https://wire.my.to/setup-wire-pod.sh | bash
+wget -O - https://www.project-victor.org/setup-wire-pod.sh | bash
 ```
 
 7. After that completes, open a browser and go to [http://escapepod:8080](http://escapepod:8080). From there, click on "Set up wire-pod" and do as it says. You do not need to do the part at the bottom where it says `Choose file`, that is reserved for OSKR/dev bots.
@@ -93,11 +82,75 @@ sudo systemctl enable avahi-daemon
 3. Open a terminal and run this command:
 
 ```
-wget -O - https://wire.my.to/setup-wire-pod.sh | bash
+wget -O - https://www.project-victor.org/setup-wire-pod.sh | bash
 ```
+
+(if it asks for a password, enter it)
 
 4. Once that has completed, go to [http://escapepod:8080](http://escapepod:8080) in a browser and click on `Set up wire-pod (API keys, STT service, etc)`. From there, follow the instructions. It should then be set up and voice commands should now work on Vector.
 
+#### Option three: Windows 10/11 via WSL
+
+TODO: tutorial video
+
+1. Open up Powershell as administrator
+	-	Open the start menu, type in Powershell, right click, click "Run as administrator"
+
+2. Enter the following commands (this will change your computer's name to `escapepod`):
+
+```
+Rename-Computer -NewName "escapepod"
+wsl --install
+```
+
+3. Reboot your computer.
+
+4. After the reboot, Ubuntu should install. Wait for it to finish.
+
+5. The Ubuntu installer should ask for a UNIX username. Enter one. example: `wire`
+
+6. It should then ask for a UNIX password. Make sure you remember this! It may not show any indication that you are typing anything, that is normal.
+
+7. You should now be at an Ubuntu terminal. Leave this open but don't type anything in it yet.
+
+8. Open up Powershell as administrator
+	-	Open the start menu, type in Powershell, right click, click "Run as administrator"
+
+9. In Powershell, run the following command. When it asks for a confirmation, enter `Y`.
+
+```Set-ExecutionPolicy Bypass```
+
+10. In Powershell, the the following commands:
+
+```
+cd ~
+curl -o wsl-firewall.ps1 https://www.project-victor.org/wsl-firewall.ps1
+.\wsl-firewall.ps1
+```
+
+11. Return to the Ubuntu terminal and enter the following command:
+
+```
+wget -O - https://www.project-victor.org/setup-wire-pod.sh | bash
+```
+
+(if it asks for a password, enter what you entered for the UNIX password earlier)
+
+12. Once that is finished, run the following command to start the server:
+
+```
+cd ~/wire-prod-pod
+sudo ./chipper/start.sh
+```
+
+12. Go to [http://escapepod:8080](http://escapepod:8080) in a browser and click on `Set up wire-pod (API keys, STT service, etc)`. From there, follow the instructions. It should then be set up and voice commands should now work on Vector.
+
+(NOTE: You have to keep the Ubuntu terminal open. If you ever reboot, you will have to open Ubuntu again and enter the following commands to start the voice server, because it does not start on system startup:)
+
+```
+cd ~/wire-prod-pod
+sudo ./chipper/start.sh
+```
 ## Updating
 
 Wire-pod auto-updates once a day. To force an update, run the following commands:
@@ -133,18 +186,17 @@ OS Support:
 - Arch
 - Debian/Ubuntu/other APT distros
 - Fedora/openSUSE
-- Windows under WSL
+- Windows 10/11 under WSL
 
 Architecture support:
 
 - amd64/x86_64
 - arm64/aarch64
-- armv7l/arm32 (picovoice only)
+- armv7l/arm32
 
 Things wire-prod-pod has worked on:
 
 - Raspberry Pi 4B+ 4GB RAM with Raspberry Pi OS
-	- Must be 64-bit OS if using Coqui
 - Raspberry Pi 4B+ 4GB RAM with Manjaro 22.04
 - Nintendo Switch with L4T Ubuntu
 - Desktop with Ryzen 5 3600, 16 GB RAM with Ubuntu 22.04
