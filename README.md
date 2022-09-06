@@ -16,8 +16,10 @@ This version is designed to be easy to setup by consumers and by people with lit
 
 ### Prerequisites
 
--   Raspberry Pi capable of running 64-bit Raspberry Pi OS
-	-	A standard computer running Linux works too. There will be two sets of instructions for whichever you choose
+-   One of the following to use as a host:
+	-	Raspberry Pi 4
+	-	Any device running Linux
+	-	Modern desktop running Windows 10 or 11
 -   A production Vector 1.0 that has already been setup like normal (no subscription required, he should just be active)
 	-	Vector 2.0 is not supported yet
 -   A computer with Google Chrome (or the new Microsoft Edge) and Bluetooth
