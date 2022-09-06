@@ -109,9 +109,13 @@ wsl --install
 
 5. The Ubuntu installer should ask for a UNIX username. Enter one. example: `wire`
 
-6. It should then ask for a UNIX password. Make sure you remember this! It may not show any indication that you are typing anything, that is normal.
+6. It should then ask for a UNIX password. Make sure you remember this! It will not show any indication that you are typing anything, that is normal.
 
-7. You should now be at an Ubuntu terminal. Leave this open but don't type anything in it yet.
+7. You should now be at an Ubuntu terminal. In that terminal, run the following command:
+
+```
+sudo apt install net-tools
+```
 
 8. Open up Powershell as administrator
 	-	Open the start menu, type in Powershell, right click, click "Run as administrator"
