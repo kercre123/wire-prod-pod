@@ -2,7 +2,7 @@
 
 Custom Vector escape pod designed for regular production Vectors. No OSKR required.
 
-This version is designed to be easy to setup by consumers and by people with little technical experience. If you would like a version that is more dev-friendly and customizable, check out [wire-pod](https://wwww.github.com/kercre123/wire-pod).
+This version is designed to be easy to setup by consumers and by people with little technical experience. If you would like a version that is more dev-friendly and customizable, check out [wire-pod](https://www.github.com/kercre123/wire-pod).
 
 ## Installation
 
