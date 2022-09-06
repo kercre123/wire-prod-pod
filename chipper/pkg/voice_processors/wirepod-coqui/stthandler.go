@@ -194,6 +194,12 @@ func sttHandler(reqThing interface{}, isKnowledgeGraph bool) (transcribedString 
 		logger.Logger(err)
 	}
 	vad.SetMode(3)
+	defer func() {
+		if err := recover(); err != nil {
+			botNum = botNum - 1
+			logger.Logger(err)
+		}
+	}()
 	for {
 		if isKnowledgeGraph {
 			chunk, chunkErr := req1.Stream.Recv()
