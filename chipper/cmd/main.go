@@ -16,7 +16,7 @@ import (
 	pb "github.com/digital-dream-labs/api/go/chipperpb"
 	"github.com/digital-dream-labs/chipper/pkg/logger"
 	"github.com/digital-dream-labs/chipper/pkg/server"
-	"github.com/digital-dream-labs/chipper/pkg/voice_processors/wirepod-coqui"
+	"github.com/digital-dream-labs/chipper/pkg/voice_processors/wirepod"
 
 	//	grpclog "github.com/digital-dream-labs/hugh/grpc/interceptors/log"
 
