@@ -29,7 +29,7 @@ This version is designed to be easy to setup by consumers and by people with lit
 
 1.	Put your Vector on the charger and hold the button for 15 seconds. The light will turn off after ~5 seconds, that is normal. Just keep holding until he turns back on (This is not the same as clearing user data. Do *NOT* clear user data).
 
-2.	He should be at a screen that shows `anki.com/v`. On a computer with Bluetooth support (preferably Windows or macOS), go to [https://www.project-victor.org/vector-epod-setup](https://www.project-victor.org/vector-epod-setup) in Chrome or Edge and follow the instructions. The download may take a few minutes to start.
+2.	He should be at a screen that shows `anki.com/v`. On a computer with Bluetooth support (preferably Windows or macOS), go to [https://keriganc.com/vector-epod-setup](https://keriganc.com/vector-epod-setup) in Chrome or Edge and follow the instructions. The download may take a few minutes to start.
 
 5.	Wait for that to finish. Once he has rebooted, continue on to the next set of instructions.
 
@@ -58,7 +58,7 @@ ssh pi@escapepod
 6. The terminal should show `pi@escapepod ~ $`. If you are there, run the following command:
 
 ```
-wget -O - https://www.project-victor.org/setup-wire-pod.sh | bash
+wget -O - https://keriganc.com/setup-wire-pod.sh | bash
 ```
 
 7. After that completes, open a browser and go to [http://escapepod:8080](http://escapepod:8080). From there, click on "Set up wire-pod" and do as it says. You do not need to do the part at the bottom where it says `Choose file`, that is reserved for OSKR/dev bots.
@@ -84,7 +84,7 @@ sudo systemctl enable avahi-daemon
 3. Open a terminal and run this command:
 
 ```
-wget -O - https://www.project-victor.org/setup-wire-pod.sh | bash
+wget -O - https://keriganc.com/setup-wire-pod.sh | bash
 ```
 
 (if it asks for a password, enter it)
@@ -130,14 +130,14 @@ sudo apt install net-tools
 
 ```
 cd ~
-curl -o wsl-firewall.ps1 https://www.project-victor.org/wsl-firewall.ps1
+curl -o wsl-firewall.ps1 https://keriganc.com/wsl-firewall.ps1
 .\wsl-firewall.ps1
 ```
 
 11. Return to the Ubuntu terminal and enter the following command:
 
 ```
-wget -O - https://www.project-victor.org/setup-wire-pod.sh | bash
+wget -O - https://keriganc.com/setup-wire-pod.sh | bash
 ```
 
 (if it asks for a password, enter what you entered for the UNIX password earlier)
