@@ -20,11 +20,16 @@
     <h2>Installation settings</h2>
         <form id="getStartSettings">
 			<h3>Speech-to-text service</h3>
-			<p>Wire-pod currently supports two STT (speech-to-text) services. The recommended/default one is Coqui, because it is completely local while still being accurate and speedy on most systems. The second option is Picovoice Leopard, which is more accurate and faster than Coqui, and is local, but usage is recorded on a server. To use Picovoice, you will have to create an account at <a href="https://console.picovoice.ai">Picovoice</a> and enter your API key. The third option is VOSK, which is similar to Coqui in that it is fully local, though it is generally a lot faster.</p>
+			<p>Wire-pod currently supports three STT (speech-to-text) services.</p>
+			<ul>
+			<li>- VOSK: recommended, fast, local, accurate</li>
+			<li>- Picovoice: fast, more accurate than VOSK, usage collected, requires you to enter an API key from <a href="https://console.picovoice.ai">Picovoice</a></li>
+			<li>- Coqui: slower but generally most accurate</li>
+			</ul>
 			<select onchange="showPicovoiceForm()" name="sttSettings" id="sttSettings" form="sttSettings">
-				<option value="coqui_stt">Coqui STT (recommended)</option>
+				<option value="vosk_stt">VOSK STT (recommended)</option>
 				<option value="picovoice_leopard">Picovoice Leopard</option>
-				<option value="vosk_stt">VOSK STT</option>	
+				<option value="coqui_stt">Coqui STT</option>
 			</select><br>
 			<div id="picovoiceAPIInput"></div>
 			<h3>Hostname</h3>
@@ -33,9 +38,9 @@
 				<option value="escapepod_local">escapepod.local (required for production bots)</option>
 				<option value="ip_address">IP Address (recommended for OSKR/dev bots)</option>		
 			</select><br>
-			<h3>Weather API</h3>
-			<p>Would you like to setup weather commands? This involves creating a free account at <a href="https://weatherapi.com/" target="_blank">weatherapi.com</a> and putting in your API key. This is optional.</p>			
-            <label for="weatherSettings">Do you want to setup weather API?:</label>
+			<h3>Weather</h3>
+			<p>Would you like to setup weather commands? This involves creating a free account at <a href="https://openweathermap.org" target="_blank">openweathermap.org</a> and putting in your API key. This is optional.</p>			
+            <label for="weatherSettings">Do you want to setup weather commands?:</label>
 			<select onchange="showWeatherForm()" name="weatherSettings" id="weatherSettings" form="weatherSettings">
 				<option value="weather_no">No</option>
 				<option value="weather_yes">Yes</option>
