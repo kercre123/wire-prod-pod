@@ -8,15 +8,20 @@ import (
 	"time"
 
 	leopard "github.com/Picovoice/leopard/binding/go"
+	vosk "github.com/alphacep/vosk-api/go"
 	"github.com/asticode/go-asticoqui"
 	"github.com/digital-dream-labs/chipper/pkg/logger"
 	"github.com/pkg/errors"
 )
 
 var usePicovoice bool = false
+var useCoqui bool = false
 var leopardSTTArray []leopard.Leopard
 var picovoiceInstancesOS string
 var picovoiceInstances int
+var debugLogging bool
+var model *vosk.VoskModel
+var sttLanguage string = "en-US"
 
 const (
 	// FallbackIntent is the failure-mode intent response
@@ -97,6 +102,16 @@ func New() (*Server, error) {
 			leopardSTTArray = append(leopardSTTArray, leopard.Leopard{AccessKey: picovoiceKey})
 			leopardSTTArray[i].Init()
 		}
+	} else if os.Getenv("STT_SERVICE") == "vosk" {
+		logger.Logger("Server START")
+		logger.Logger("Opening model")
+		aModel, err := vosk.NewModel("../vosk/models/" + sttLanguage + "/model")
+		if err != nil {
+			log.Fatal(err)
+		}
+		model = aModel
+		logger.Logger("Model open!")
+		logger.Logger("Server OK")
 	} else {
 		usePicovoice = false
 		var testTimer float64
@@ -115,6 +130,7 @@ func New() (*Server, error) {
 			return nil, errors.New("ERR: No .scorer file found.")
 		}
 		coquiStream, err := coquiInstance.NewStream()
+		useCoqui = true
 		if err != nil {
 			logger.Logger(err)
 			return nil, nil

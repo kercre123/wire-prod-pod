@@ -3,14 +3,17 @@ package wirepod
 import (
 	"bytes"
 	"encoding/binary"
+	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"os"
 	"strconv"
 	"strings"
 	"time"
 
 	leopard "github.com/Picovoice/leopard/binding/go"
+	vosk "github.com/alphacep/vosk-api/go"
 	"github.com/asticode/go-asticoqui"
 	"github.com/digital-dream-labs/chipper/pkg/logger"
 	"github.com/digital-dream-labs/chipper/pkg/vtt"
@@ -104,6 +107,7 @@ func sttHandler(reqThing interface{}, isKnowledgeGraph bool) (transcribedString 
 	var deviceESN string
 	var deviceSession string
 	var leopardSTT leopard.Leopard
+	var voskRec *vosk.VoskRecognizer
 	botNum = botNum + 1
 	justThisBotNum := botNum
 	if isKnowledgeGraph {
@@ -164,7 +168,7 @@ func sttHandler(reqThing interface{}, isKnowledgeGraph bool) (transcribedString 
 	logger.Logger("Processing...")
 	inactiveNumMax := 20
 	var coquiStream *asticoqui.Stream
-	if !isKnowledgeGraph && !usePicovoice {
+	if !isKnowledgeGraph && !usePicovoice && useCoqui {
 		coquiInstance, _ := asticoqui.New("../stt/model.tflite")
 		if _, err := os.Stat("../stt/large_vocabulary.scorer"); err == nil {
 			coquiInstance.EnableExternalScorer("../stt/large_vocabulary.scorer")
@@ -187,6 +191,21 @@ func sttHandler(reqThing interface{}, isKnowledgeGraph bool) (transcribedString 
 			return "", transcribedSlots, false, justThisBotNum, false, fmt.Errorf("Too many bots are connected, max is " + picovoiceInstancesOS)
 		} else {
 			leopardSTT = leopardSTTArray[botNum-1]
+		}
+	}
+	if !useCoqui && !usePicovoice {
+		sampleRate := 16000.0
+		voskRec, err = vosk.NewRecognizer(model, sampleRate)
+		if err != nil {
+			log.Fatal(err)
+		}
+		voskRec.SetWords(1)
+		micData = bytesToIntVAD(stream, data, die, isOpus)
+		for _, sample := range micData {
+			//buf := bytesToSamples(sample)
+			if voskRec.AcceptWaveform(sample) != 0 {
+				fmt.Println(voskRec.Result())
+			}
 		}
 	}
 	vad, err := webrtcvad.New()
@@ -249,8 +268,13 @@ func sttHandler(reqThing interface{}, isKnowledgeGraph bool) (transcribedString 
 		for _, sample := range micData {
 			if !speechDone {
 				if numInRange >= oldDataLength {
-					if !isKnowledgeGraph && !usePicovoice {
+					if !isKnowledgeGraph && !usePicovoice && useCoqui {
 						coquiStream.FeedAudioContent(bytesToSamples(sample))
+					}
+					if !usePicovoice && !useCoqui {
+						if voskRec.AcceptWaveform(sample) != 0 {
+							fmt.Println(voskRec.Result())
+						}
 					}
 					active, err := vad.Process(16000, sample)
 					if err != nil {
@@ -307,8 +331,15 @@ func sttHandler(reqThing interface{}, isKnowledgeGraph bool) (transcribedString 
 				if usePicovoice {
 					transcribedTextPre, _, _ := leopardSTT.Process(bytesToIntLeopard(stream, data, die, isOpus))
 					transcribedText = strings.ToLower(transcribedTextPre)
-				} else {
+				} else if useCoqui {
 					transcribedText, _ = coquiStream.Finish()
+				} else {
+					var jres map[string]interface{}
+					json.Unmarshal([]byte(voskRec.FinalResult()), &jres)
+					transcribedText = jres["text"].(string)
+					logger.Logger("transcribed text: " + transcribedText)
+					logger.Logger("Bot " + strconv.Itoa(justThisBotNum) + " Transcribed text: " + transcribedText)
+					die = true
 				}
 				logger.Logger("Bot " + strconv.Itoa(justThisBotNum) + " Transcribed text: " + transcribedText)
 				die = true

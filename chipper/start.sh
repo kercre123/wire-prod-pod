@@ -23,13 +23,18 @@ if [[ -f ./source.sh ]]; then
 fi
 
 if [[ -f ./chipper ]]; then
-      export CGO_LDFLAGS="-L/root/.coqui/"
-      export CGO_CXXFLAGS="-I/root/.coqui/"
-      export LD_LIBRARY_PATH="/root/.coqui/:$LD_LIBRARY_PATH"
+      	export CGO_CXXFLAGS="-I$HOME/.coqui/"
+	export CGO_ENABLED=1
+	export CGO_CFLAGS="-I/root/.vosk/libvosk"
+	export CGO_LDFLAGS="-L/root/.coqui/ -L /root/.vosk/libvosk -lvosk -ldl -lpthread"
+	export LD_LIBRARY_PATH="/root/.coqui/:/root/.vosk/libvosk:$LD_LIBRARY_PATH"
   ./chipper
 else
-      export CGO_LDFLAGS="-L$HOME/.coqui/"
-      export CGO_CXXFLAGS="-I$HOME/.coqui/"
-      export LD_LIBRARY_PATH="$HOME/.coqui/:$LD_LIBRARY_PATH"
+  	export CGO_CXXFLAGS="-I/root/.coqui/"
+	export CGO_ENABLED=1
+	export CGO_CFLAGS="-I/root/.vosk/libvosk"
+	export CGO_LDFLAGS="-L/root/.coqui/ -L /root/.vosk/libvosk -lvosk -ldl -lpthread"
+	export LD_LIBRARY_PATH="/root/.coqui/:/root/.vosk/libvosk:$LD_LIBRARY_PATH"
+   echo "ERROR: chipper binary does not exist. Please open a Github issue if you see this."
   /usr/local/go/bin/go run cmd/main.go
 fi

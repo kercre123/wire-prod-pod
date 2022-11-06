@@ -20,10 +20,11 @@
     <h2>Installation settings</h2>
         <form id="getStartSettings">
 			<h3>Speech-to-text service</h3>
-			<p>Wire-pod currently supports two STT (speech-to-text) services. The recommended/default one is Coqui, because it is completely local while still being accurate and speedy on most systems. The other option is Picovoice Leopard, which is more accurate and faster than Coqui, and is local, but usage is recorded on a server. To use Picovoice, you will have to create an account at <a href="https://console.picovoice.ai">Picovoice</a> and enter your API key.</p>
+			<p>Wire-pod currently supports two STT (speech-to-text) services. The recommended/default one is Coqui, because it is completely local while still being accurate and speedy on most systems. The second option is Picovoice Leopard, which is more accurate and faster than Coqui, and is local, but usage is recorded on a server. To use Picovoice, you will have to create an account at <a href="https://console.picovoice.ai">Picovoice</a> and enter your API key. The third option is VOSK, which is similar to Coqui in that it is fully local, though it is generally a lot faster.</p>
 			<select onchange="showPicovoiceForm()" name="sttSettings" id="sttSettings" form="sttSettings">
 				<option value="coqui_stt">Coqui STT (recommended)</option>
-				<option value="picovoice_leopard">Picovoice Leopard</option>		
+				<option value="picovoice_leopard">Picovoice Leopard</option>
+				<option value="vosk_stt">VOSK STT</option>	
 			</select><br>
 			<div id="picovoiceAPIInput"></div>
 			<h3>Hostname</h3>

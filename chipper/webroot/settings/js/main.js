@@ -103,6 +103,8 @@ function setupPod() {
             return
         }
         sttSend = "leopard"
+    } else if (sttValue == "vosk_stt") {
+        sttSend = "vosk"
     } else {
         sttSend = "coqui"
     }
