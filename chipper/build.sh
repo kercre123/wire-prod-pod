@@ -1,4 +1,7 @@
 #!/bin/bash
+cd ..
+./postupdate.sh
+cd chipper
   	export CGO_CXXFLAGS="-I/root/.coqui/"
 	export CGO_ENABLED=1
 	export CGO_CFLAGS="-I/root/.vosk/libvosk"
