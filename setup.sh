@@ -64,13 +64,13 @@ function getPackages() {
 		echo "Installing required packages (ffmpeg, golang, wget, openssl, net-tools, iproute2, sox, opus)"
 		if [[ ${TARGET} == "debian" ]]; then
 			apt update -y
-			apt install -y wget openssl net-tools libsox-dev libopus-dev make iproute2 xz-utils libopusfile-dev pkg-config gcc curl g++
+			apt install -y wget openssl net-tools libsox-dev libopus-dev make iproute2 xz-utils libopusfile-dev pkg-config gcc curl g++ unzip avahi-daemon git
 		elif [[ ${TARGET} == "arch" ]]; then
 			pacman -Sy --noconfirm
-			sudo pacman -S --noconfirm wget openssl net-tools sox opus make iproute2 opusfile curl
+			sudo pacman -S --noconfirm wget openssl net-tools sox opus make iproute2 opusfile curl unzip avahi git
 		elif [[ ${TARGET} == "fedora" ]]; then
 			dnf update
-			dnf install -y wget openssl net-tools sox opus make opusfile curl
+			dnf install -y wget openssl net-tools sox opus make opusfile curl unzip avahi git
 		fi
 		touch ./vector-cloud/packagesGotten
 		echo
