@@ -13,6 +13,7 @@ This version is designed to be easy to setup by consumers and by people with lit
 -	The SDK should work fine, though make sure you authenticate it before you setup wire-pod.
 -   It is recommended you use a Raspberry Pi 4, though you can use any Linux computer
 -   For this; you do not need to pay for the voice subscription, Escape Pod, or any DDL service.
+-   Please note that the phone apps (Android and iOS) will no longer be able to connect to a Vector tethered to Wire-Prod-Pod
 
 ### Prerequisites
 
