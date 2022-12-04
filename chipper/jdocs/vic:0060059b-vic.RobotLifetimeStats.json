@@ -1,9 +1,0 @@
-{
-   "BStat.AnimationPlayed" : 5,
-   "BStat.BehaviorActivated" : 5,
-   "Feature.AI.Onboarding" : 1,
-   "Odom.Body" : 6000,
-   "Odom.RWheel" : 12000,
-   "Stim.CumlPosDelta" : 2000,
-   "Stim.StimSeconds" : 39267
-}

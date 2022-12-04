@@ -16,4 +16,5 @@
 /chipper/ssh_root_key
 /chipper/customIntents.json
 /chipper/botConfig.json
+/chipper/jdocs/*.json
 /vosk
