@@ -40,6 +40,8 @@ wire-pod can be setup either on a Raspberry Pi, pretty much any Linux desktop, o
 
 Only do one of the following sets of instructions.
 
+After you have followed one of the installation instructions, continue on to "Finish setting up the bot".
+
 #### Option one: Raspberry Pi 4
 
 1. Download and install [Raspberry Pi Imager](https://www.raspberrypi.com/software/), insert a micro-SD card into your computer/into a reader
