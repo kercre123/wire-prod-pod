@@ -4,6 +4,8 @@ Custom Vector escape pod designed for regular production Vectors. No OSKR requir
 
 This version is designed to be easy to setup by consumers and by people with little technical experience. If you would like a version that is more dev-friendly and customizable, check out [wire-pod](https://www.github.com/kercre123/wire-pod).
 
+***
+
 ## Installation
 
 ### Some general notices for production Vectors:
@@ -159,6 +161,8 @@ sudo ./chipper/start.sh
 
 3. Enter user settings and press "SUBMIT". Vector should then be fully set up!
 
+***
+
 ## Updating
 
 Wire-pod auto-updates once a day. To force an update, run the following commands:
@@ -167,6 +171,8 @@ Wire-pod auto-updates once a day. To force an update, run the following commands
 cd ~/wire-prod-pod
 sudo ./update.sh
 ```
+
+***
 
 ## Web interface
 
@@ -186,6 +192,8 @@ To get to it, open a browser and go to `http://serverip:8080`, replacing serveri
 		- ![Bot Configuration Screenshot](./images/botConfig.png)
 - See logs
 	- This shows the logs produced by wire-pod. Updates every 200ms, shows the last 30 lines.
+
+***
 
 ## Status
 
@@ -279,7 +287,8 @@ Current implemented actions:
 	- Enable `Messaging` feature in webViz Features tab
 - Play a message for <name>
 	- Enable `Messaging` feature in webViz Features tab
-
+***
+	
 ## Credits
 
 - [Digital Dream Labs](https://github.com/digital-dream-labs) for saving Vector and for open sourcing chipper which made this possible
