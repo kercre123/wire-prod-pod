@@ -269,7 +269,7 @@ func startServer() {
 		logger.Logger("This can be solved via the webserver.")
 		return
 	}
-	p, err := wirepod.New("vosk")
+	p, err := wirepod.New(os.Getenv("STT_SERVICE"))
 	var canGoOn bool = true
 	if err != nil {
 		logger.Logger("Something is broken in the voice server config.")
