@@ -24,7 +24,7 @@
 			<ul>
 			<li>- VOSK: recommended, fast, local, accurate</li>
 			<li>- Picovoice: fast, more accurate than VOSK, usage collected, requires you to enter an API key from <a href="https://console.picovoice.ai">Picovoice</a></li>
-			<li>- Coqui: slower but generally most accurate</li>
+			<li>- Coqui: slower but generally accurate</li>
 			</ul>
 			<select onchange="showPicovoiceForm()" name="sttSettings" id="sttSettings" form="sttSettings">
 				<option value="vosk_stt">VOSK STT (recommended)</option>
@@ -57,7 +57,12 @@
         </form>
         <button onclick="setupPod()">Setup wire-pod</button>
 		<hr>
-		<h2>Set up OSKR/dev bot</h2>
+		<h2>Set up a regular production bot</h2>
+		<p>Make sure your bot is on the escape pod software (instructions in the wiki).</p>
+		<p>It is recommended to clear user data, but it is not required.</p>
+		<p>Go to this site on a Bluetooth-enabled device and follow the directions to set up your Vector: <a href="https://keriganc.com/vector-epod-setup">https://keriganc.com/vector-epod-setup</a></p>
+		<hr>
+		<h2>Set up OSKR/dev-unlocked bot</h2>
 		<p>Once you have setup wire-pod, use this form to setup your OSKR/dev-unlocked bot. If you have a prod bot, skip this.</p>
 		<p>Setting the bot up should take about 10-20 seconds.</p>
 		<form id="setupBot">

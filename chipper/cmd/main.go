@@ -14,8 +14,13 @@ import (
 	"syscall"
 
 	pb "github.com/digital-dream-labs/api/go/chipperpb"
+	jdocspb "github.com/digital-dream-labs/api/go/jdocspb"
+	tokenpb "github.com/digital-dream-labs/api/go/tokenpb"
+	jdocsserver "github.com/digital-dream-labs/chipper/pkg/jdocsserver"
 	"github.com/digital-dream-labs/chipper/pkg/logger"
+	sdkWeb "github.com/digital-dream-labs/chipper/pkg/sdkapp"
 	"github.com/digital-dream-labs/chipper/pkg/server"
+	tokenserver "github.com/digital-dream-labs/chipper/pkg/tokenserver"
 	"github.com/digital-dream-labs/chipper/pkg/voice_processors/wirepod"
 
 	//	grpclog "github.com/digital-dream-labs/hugh/grpc/interceptors/log"
@@ -155,6 +160,7 @@ func chipperAPIHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	go sdkWeb.BeginServer()
 	log.SetJSONFormat("2006-01-02 15:04:05")
 	if os.Getenv("DDL_RPC_PORT") != "" {
 		var chipperConfigReq chipperConfigStruct
@@ -287,7 +293,13 @@ func startServer() {
 			}
 		}()
 
+		tokenServer := tokenserver.NewTokenServer()
+		jdocsServer := jdocsserver.NewJdocsServer()
+
 		pb.RegisterChipperGrpcServer(srv.Transport(), s)
+		logger.Logger("Registering jdocs and token handlers")
+		jdocspb.RegisterJdocsServer(srv.Transport(), jdocsServer)
+		tokenpb.RegisterTokenServer(srv.Transport(), tokenServer)
 
 		srv.Start()
 		logger.Logger("Server started successfully!")
