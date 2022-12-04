@@ -21,7 +21,7 @@ import (
 	sdkWeb "github.com/digital-dream-labs/chipper/pkg/sdkapp"
 	"github.com/digital-dream-labs/chipper/pkg/server"
 	tokenserver "github.com/digital-dream-labs/chipper/pkg/tokenserver"
-	"github.com/digital-dream-labs/chipper/pkg/voice_processors/wirepod"
+	wirepod "github.com/digital-dream-labs/chipper/pkg/voice_processors"
 
 	//	grpclog "github.com/digital-dream-labs/hugh/grpc/interceptors/log"
 
@@ -240,6 +240,7 @@ func startServer() {
 		os.Setenv("DDL_RPC_CLIENT_AUTHENTICATION", "NoClientCert")
 		os.Setenv("WEATHERAPI_ENABLED", chipperConfig.WeatherEnable)
 		os.Setenv("WEATHERAPI_KEY", chipperConfig.WeatherKey)
+		os.Setenv("WEATHERAPI_PROVIDER", "openweathermap.org")
 		os.Setenv("WEATHERAPI_UNIT", chipperConfig.WeatherUnit)
 		os.Setenv("HOUNDIFY_ENABLED", chipperConfig.HoundifyEnable)
 		os.Setenv("HOUNDIFY_CLIENT_KEY", chipperConfig.HoundifyKey)
@@ -268,7 +269,7 @@ func startServer() {
 		logger.Logger("This can be solved via the webserver.")
 		return
 	}
-	p, err := wirepod.New()
+	p, err := wirepod.New("vosk")
 	var canGoOn bool = true
 	if err != nil {
 		logger.Logger("Something is broken in the voice server config.")

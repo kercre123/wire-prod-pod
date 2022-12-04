@@ -15,8 +15,7 @@ func LoadPlugins() {
 	logger("Loading plugins")
 	entries, err := os.ReadDir("./plugins")
 	if err != nil {
-		logger("Unable to load plugins:")
-		logger(err)
+		logger("Not loading plugins because the plugins directory doesn't exist")
 	}
 	for _, file := range entries {
 		if strings.Contains(file.Name(), ".so") {

@@ -139,6 +139,7 @@ func (s *Server) ProcessKnowledgeGraph(req *vtt.KnowledgeGraphRequest) (*vtt.Kno
 			CommandType: NoResult,
 			SpokenText:  NoResultSpoken,
 		}
+		botNum = botNum - 1
 		if err := req.Stream.Send(&kg); err != nil {
 			return nil, err
 		}
