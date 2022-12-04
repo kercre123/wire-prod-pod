@@ -9,11 +9,11 @@ This version is designed to be easy to setup by consumers and by people with lit
 ### Some general notices for production Vectors:
 
 -   This will require you to put your Vector on 1.8. You cannot keep him on 1.6 if you want to use these instructions.
--   This will NOT clear user data.
--	The SDK should work fine, though make sure you authenticate it before you setup wire-pod.
+-   While it is recommended to clear user data, it is not required.
 -   It is recommended you use a Raspberry Pi 4, though you can use any Linux computer
 -   For this; you do not need to pay for the voice subscription, Escape Pod, or any DDL service.
 -   Please note that the phone apps (Android and iOS) will no longer be able to connect to a Vector tethered to Wire-Prod-Pod
+	- wire-prod-pod contains a fully-featured Vector mobile app replacement
 
 ### Prerequisites
 
@@ -21,7 +21,7 @@ This version is designed to be easy to setup by consumers and by people with lit
 	-	Raspberry Pi 4
 	-	Any device running Linux
 	-	Modern desktop running Windows 10 or 11
--   A production Vector 1.0 that has already been setup like normal (no subscription required, he should just be active)
+-   A production Vector 1.0
 	-	Vector 2.0 is not supported yet
 -   A computer with Google Chrome (or the new Microsoft Edge) and Bluetooth
 	-	If you are using Linux, go to [chrome://flags](chrome://flags) and enable `Experimental web platform features`, then relaunch Chrome
@@ -32,7 +32,7 @@ This version is designed to be easy to setup by consumers and by people with lit
 
 2.	He should be at a screen that shows `anki.com/v`. On a computer with Bluetooth support (preferably Windows or macOS), go to [https://keriganc.com/vector-epod-setup](https://keriganc.com/vector-epod-setup) in Chrome or Edge and follow the instructions. The download may take a few minutes to start.
 
-5.	Wait for that to finish. Once he has rebooted, continue on to the next set of instructions.
+3.	Wait for that to finish. Once he has rebooted, continue on to the next set of instructions.
 
 ### Set up wire-pod
 
@@ -70,19 +70,7 @@ wget -O - https://keriganc.com/setup-wire-pod.sh | bash
 
 (Your distribution must have either pacman, dnf, or apt, make sure you have ports 443 and 8080 open)
 
-1. Open a terminal
-
-2. Use the following commands to change your hostname to `escapepod` and have that register with the network (this will change your computer's name):
-
-```
-sudo hostnamectl set-hostname escapepod
-sudo systemctl restart avahi-daemon
-sudo systemctl enable avahi-daemon
-```
-
-(ignore any errors that may pop up, they are normal)
-
-3. Open a terminal and run this command:
+1. Open a terminal and run this command:
 
 ```
 wget -O - https://keriganc.com/setup-wire-pod.sh | bash
@@ -90,7 +78,7 @@ wget -O - https://keriganc.com/setup-wire-pod.sh | bash
 
 (if it asks for a password, enter it)
 
-4. Once that has completed, go to [http://escapepod:8080](http://escapepod:8080) in a browser and click on `Set up wire-pod (API keys, STT service, etc)`. From there, follow the instructions. It should then be set up and voice commands should now work on Vector.
+2. Once that has completed, go to [http://escapepod:8080](http://escapepod:8080) in a browser and click on `Set up wire-pod (API keys, STT service, etc)`. From there, follow the instructions. It should then be set up.
 
 #### Option three: Windows 10/11 via WSL
 
@@ -158,6 +146,17 @@ sudo ./chipper/start.sh
 cd ~/wire-prod-pod
 sudo ./chipper/start.sh
 ```
+
+### Finish setting up the bot
+
+- It is recommended to clear user data before performing this, but it is not required.
+
+1. On a device with Bluetooth (can be the same machine as what wire-prod-pod is running on), go to [vector-epod-setup](https://keriganc.com/vector-epod-setup) and follow the instructions.
+
+2. When it gets to a button showing "ACTIVATE", click it. If it shows up again, click on it again.
+
+3. Enter user settings and press "SUBMIT". Vector should then be fully set up!
+
 ## Updating
 
 Wire-pod auto-updates once a day. To force an update, run the following commands:
