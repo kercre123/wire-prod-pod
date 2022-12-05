@@ -16,7 +16,6 @@ func paramCheckerEnUS(req interface{}, intent string, speechText string, justThi
 	var botUnits string = "F"
 	var botPlaySpecific bool = false
 	var botIsEarlyOpus bool = false
-	logger("./jdocs/vic:" + botSerial + "-vic.RobotSettings.json")
 	if _, err := os.Stat("./jdocs/vic:" + botSerial + "-vic.RobotSettings.json"); err == nil {
 		logger("Found robot settings jdoc for " + botSerial + ", using location and units from that")
 		type robotSettingsJson struct {

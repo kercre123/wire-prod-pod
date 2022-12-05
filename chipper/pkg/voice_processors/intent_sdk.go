@@ -43,9 +43,8 @@ func handleSdkIntent(req interface{}, intent string, speechText string, intentPa
 			}
 		}
 		stop <- true
+		return returnIntent
 	}
-
-	return returnIntent
 }
 
 func rollADie() {

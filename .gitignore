@@ -18,3 +18,4 @@
 /chipper/botConfig.json
 /chipper/jdocs/*.json
 /vosk
+/chipper/nvm/*
