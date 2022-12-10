@@ -1,5 +1,9 @@
 #!/bin/bash
 
+if [[ -f /usr/bin/apt ]]; then
+	apt install -y libasound2-dev
+fi
+
 if [[ ! -d /root/.vosk ]]; then
     origDir=$(pwd)
     echo "Getting VOSK assets"
