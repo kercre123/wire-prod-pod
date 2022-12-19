@@ -4,10 +4,10 @@ import (
 	"context"
 	"crypto/rand"
 	"crypto/rsa"
+	"fmt"
 	"time"
 
 	"github.com/digital-dream-labs/api/go/tokenpb"
-	"github.com/digital-dream-labs/chipper/pkg/logger"
 	"github.com/golang-jwt/jwt"
 )
 
@@ -24,7 +24,7 @@ type RobotSDKInfoStore struct {
 }
 
 func (s *TokenServer) AssociatePrimaryUser(ctx context.Context, req *tokenpb.AssociatePrimaryUserRequest) (*tokenpb.AssociatePrimaryUserResponse, error) {
-	logger.Logger("Token: Incoming Associate Primary User request")
+	fmt.Println("Token: Incoming Associate Primary User request")
 	token := jwt.NewWithClaims(jwt.SigningMethodRS512, jwt.MapClaims{
 		"expires":      "2029-11-26T16:27:51.997352463Z",
 		"iat":          time.Now(),
@@ -47,7 +47,7 @@ func (s *TokenServer) AssociatePrimaryUser(ctx context.Context, req *tokenpb.Ass
 }
 
 func (s *TokenServer) AssociateSecondaryClient(ctx context.Context, req *tokenpb.AssociateSecondaryClientRequest) (*tokenpb.AssociateSecondaryClientResponse, error) {
-	logger.Logger("Token: Incoming Associate Secondary Client request")
+	fmt.Println("Token: Incoming Associate Secondary Client request")
 	token := jwt.NewWithClaims(jwt.SigningMethodRS512, jwt.MapClaims{
 		"expires":      "2029-11-26T16:27:51.997352463Z",
 		"iat":          time.Now(),
@@ -70,7 +70,7 @@ func (s *TokenServer) AssociateSecondaryClient(ctx context.Context, req *tokenpb
 }
 
 func (s *TokenServer) RefreshToken(ctx context.Context, req *tokenpb.RefreshTokenRequest) (*tokenpb.RefreshTokenResponse, error) {
-	logger.Logger("Token: Incoming Refresh Token Request")
+	fmt.Println("Token: Incoming Refresh Token Request")
 	token := jwt.NewWithClaims(jwt.SigningMethodRS512, jwt.MapClaims{
 		"expires":      "2029-11-26T16:27:51.997352463Z",
 		"iat":          time.Now(),

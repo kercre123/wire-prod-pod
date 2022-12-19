@@ -4,7 +4,7 @@ go 1.18
 
 require (
 	github.com/Picovoice/leopard/binding/go v1.1.2
-	github.com/alphacep/vosk-api/go v0.3.43
+	github.com/alphacep/vosk-api/go v0.3.45
 	github.com/asticode/go-asticoqui v0.2.0
 	github.com/digital-dream-labs/api v0.0.0-20210824232136-8cc90c1bb12c
 	github.com/digital-dream-labs/hugh v0.0.0-20210210154335-f4159b9fcd5f
@@ -22,7 +22,7 @@ require (
 	github.com/PerformLine/go-stockutil v1.9.3 // indirect
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751 // indirect
 	github.com/alecthomas/units v0.0.0-20211218093645-b94a6e3cc137 // indirect
-	github.com/alphacep/vosk-api v0.3.43 // indirect
+	github.com/alphacep/vosk-api v0.3.45 // indirect
 	github.com/bregydoc/gtranslate v0.0.0-20200913051839-1bd07f6c1fc5 // indirect
 	github.com/cryptix/wav v0.0.0-20180415113528-8bdace674401 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
