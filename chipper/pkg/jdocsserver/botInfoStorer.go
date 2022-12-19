@@ -3,10 +3,10 @@ package jdocsserver
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"os"
 	"strings"
 
+	"github.com/digital-dream-labs/chipper/pkg/logger"
 	"google.golang.org/grpc/peer"
 	"gopkg.in/ini.v1"
 )
@@ -56,7 +56,7 @@ func IniToJson() {
 					}
 				}
 				if !matched {
-					fmt.Println("Adding " + cfg.SerialNo + " to JSON from INI")
+					logger.Logger("Adding " + cfg.SerialNo + " to JSON from INI")
 					robotSDKInfo.Robots = append(robotSDKInfo.Robots, struct {
 						Esn       string `json:"esn"`
 						IPAddress string `json:"ip_address"`
@@ -82,7 +82,7 @@ func IniToJson() {
 						}
 					}
 					if !matched {
-						fmt.Println("Adding " + cfg.SerialNo + " to JSON from INI")
+						logger.Logger("Adding " + cfg.SerialNo + " to JSON from INI")
 						robotSDKInfo.Robots = append(robotSDKInfo.Robots, struct {
 							Esn       string `json:"esn"`
 							IPAddress string `json:"ip_address"`
@@ -97,17 +97,17 @@ func IniToJson() {
 	}
 	finalJsonBytes, _ := json.Marshal(robotSDKInfo)
 	os.WriteFile("./jdocs/botSdkInfo.json", finalJsonBytes, 0644)
-	fmt.Println("Ini to JSON finished")
+	logger.Logger("Ini to JSON finished")
 }
 
 func storeBotInfo(ctx context.Context, thing string) {
-	fmt.Println("Storing bot info for later SDK use")
+	logger.Logger("Storing bot info for later SDK use")
 	var appendNew bool = true
 	p, _ := peer.FromContext(ctx)
 	ipAddr := strings.TrimSpace(strings.Split(p.Addr.String(), ":")[0])
-	fmt.Println("Bot IP: `" + ipAddr + "`")
+	logger.Logger("Bot IP: `" + ipAddr + "`")
 	botEsn := strings.TrimSpace(strings.Split(thing, ":")[1])
-	fmt.Println("Bot ESN: `" + botEsn + "`")
+	logger.Logger("Bot ESN: `" + botEsn + "`")
 	var robotSDKInfo RobotSDKInfoStore
 	eFileBytes, err := os.ReadFile("./jdocs/botSdkInfo.json")
 	if err == nil {
@@ -125,7 +125,7 @@ func storeBotInfo(ctx context.Context, thing string) {
 					cfg := options{}
 					section.MapTo(&cfg)
 					robotSDKInfo.Robots[num].GUID = cfg.Token
-					fmt.Println("Found GUID in ini, " + cfg.Token)
+					logger.Logger("Found GUID in ini, " + cfg.Token)
 				}
 			}
 		}
@@ -139,5 +139,5 @@ func storeBotInfo(ctx context.Context, thing string) {
 	}
 	finalJsonBytes, _ := json.Marshal(robotSDKInfo)
 	os.WriteFile("./jdocs/botSdkInfo.json", finalJsonBytes, 0644)
-	fmt.Println(string(finalJsonBytes))
+	logger.Logger(string(finalJsonBytes))
 }

@@ -16,6 +16,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/digital-dream-labs/chipper/pkg/logger"
 	"github.com/digital-dream-labs/hugh/grpc/client"
 	"github.com/fforchino/vector-go-sdk/pkg/vector"
 	"github.com/fforchino/vector-go-sdk/pkg/vectorpb"
@@ -322,7 +323,7 @@ func NewWP(serial string, useGlobal bool) (*vector.Vector, error) {
 				cfg.Token = robotSDKInfo.GlobalGUID
 			} else {
 				cfg.Token = robot.GUID
-				fmt.Println("Using " + cfg.Token)
+				logger.Logger("Using " + cfg.Token)
 			}
 		}
 	}
@@ -463,18 +464,18 @@ func SdkapiHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		sdkAddress = robot.Cfg.Target
-		fmt.Println("sdkApp: Initiating SDK with " + robot.Cfg.SerialNo)
+		logger.Logger("sdkApp: Initiating SDK with " + robot.Cfg.SerialNo)
 		robotGUID = robot.Cfg.Token
 		_, err = robot.Conn.BatteryState(ctx, &vectorpb.BatteryStateRequest{})
 		if err != nil {
-			fmt.Println("Failed to initiate SDK with normal GUID, trying global GUID")
+			logger.Logger("Failed to initiate SDK with normal GUID, trying global GUID")
 			robot, err = NewWP(serial, true)
 			if err != nil {
 				fmt.Fprint(w, "failed: "+err.Error())
 				return
 			}
 			sdkAddress = robot.Cfg.Target
-			fmt.Println("sdkApp: Initiating SDK with " + robot.Cfg.SerialNo)
+			logger.Logger("sdkApp: Initiating SDK with " + robot.Cfg.SerialNo)
 			robotGUID = robot.Cfg.Token
 			_, err = robot.Conn.BatteryState(ctx, &vectorpb.BatteryStateRequest{})
 			if err != nil {
@@ -582,10 +583,10 @@ func BeginServer() {
 	http.Handle("/stream", camStream)
 	// in jdocspinger.go
 	http.HandleFunc("/ok:80", connCheck)
-	fmt.Println("Starting SDK app")
+	logger.Logger("Starting SDK app")
 
 	fmt.Printf("Starting server at port 80 for connCheck\n")
 	if err := http.ListenAndServe(":80", nil); err != nil {
-		fmt.Println("A process is already using port 80 - connCheck functionality will not work")
+		logger.Logger("A process is already using port 80 - connCheck functionality will not work")
 	}
 }

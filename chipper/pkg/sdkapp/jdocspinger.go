@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/digital-dream-labs/chipper/pkg/logger"
 	"github.com/fforchino/vector-go-sdk/pkg/vectorpb"
 )
 
@@ -23,8 +24,8 @@ func pingJdocs(target string) {
 	var serial string
 	jsonBytes, err := os.ReadFile("jdocs/botSdkInfo.json")
 	if err != nil {
-		fmt.Println("Error opening " + "jdocs/botSdkInfo.json" + ", this bot likely hasn't been authed")
-		fmt.Println("Error pinging jdocs")
+		logger.Logger("Error opening " + "jdocs/botSdkInfo.json" + ", this bot likely hasn't been authed")
+		logger.Logger("Error pinging jdocs")
 		return
 	}
 	var robotSDKInfo RobotSDKInfoStore
@@ -37,13 +38,13 @@ func pingJdocs(target string) {
 		}
 	}
 	if !matched {
-		fmt.Println("vector-go-sdk error: serial did not match any bot in bot json")
-		fmt.Println("Error pinging jdocs")
+		logger.Logger("vector-go-sdk error: serial did not match any bot in bot json")
+		logger.Logger("Error pinging jdocs")
 		return
 	}
 	robotTmp, err := NewWP(serial, false)
 	if err != nil {
-		fmt.Println(err)
+		logger.Logger(err)
 		return
 	}
 	sdkAddress = robotTmp.Cfg.Target
@@ -52,16 +53,16 @@ func pingJdocs(target string) {
 	if err != nil {
 		robotTmp, err = NewWP(serial, true)
 		if err != nil {
-			fmt.Println(err)
-			fmt.Println("Error pinging jdocs")
+			logger.Logger(err)
+			logger.Logger("Error pinging jdocs")
 			return
 		}
 		sdkAddress = robotTmp.Cfg.Target
 		robotGUID = robotTmp.Cfg.Token
 		_, err = robotTmp.Conn.BatteryState(ctx, &vectorpb.BatteryStateRequest{})
 		if err != nil {
-			fmt.Println(err)
-			fmt.Println("Error pinging jdocs")
+			logger.Logger(err)
+			logger.Logger("Error pinging jdocs")
 			return
 		}
 	}
@@ -71,7 +72,7 @@ func pingJdocs(target string) {
 	if err != nil {
 		return
 	}
-	fmt.Println("Successfully got jdocs from " + serial)
+	logger.Logger("Successfully got jdocs from " + serial)
 	return
 }
 
@@ -91,21 +92,21 @@ func startJdocsTimer(target string) {
 	if !jdocsTimerStarted[jdocsBotNum] {
 		jdocsTimerStarted[jdocsBotNum] = true
 		jdocsShouldPing[jdocsBotNum] = false
-		fmt.Println("Starting jdocs pinger timer for " + target)
+		logger.Logger("Starting jdocs pinger timer for " + target)
 		go func() {
 			// wait 10 seconds
 			for {
 				time.Sleep(time.Second * 1)
 				jdocsTimers[jdocsBotNum] = jdocsTimers[jdocsBotNum] + 1
 				if jdocsTimers[jdocsBotNum] == 10 {
-					fmt.Println("No connCheck from " + target + " in more than 10 seconds, will ping jdocs on next check")
+					logger.Logger("No connCheck from " + target + " in more than 10 seconds, will ping jdocs on next check")
 					jdocsShouldPing[jdocsBotNum] = true
 					jdocsTimerStarted[jdocsBotNum] = false
 					return
 				}
 				if jdocsTimerReset[jdocsBotNum] {
 					jdocsTimers[jdocsBotNum] = 0
-					//fmt.Println("Resetting timer to 0 for bot " + target)
+					//logger.Logger("Resetting timer to 0 for bot " + target)
 					jdocsTimerReset[jdocsBotNum] = false
 				}
 			}
@@ -140,7 +141,7 @@ func connCheck(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "not found", http.StatusNotFound)
 		return
 	case r.URL.Path == "/ok:80":
-		//	fmt.Println("connCheck request from " + r.RemoteAddr)
+		//	logger.Logger("connCheck request from " + r.RemoteAddr)
 		robotTarget := strings.Split(r.RemoteAddr, ":")[0] + ":443"
 		robotTargetCheck := strings.Split(r.RemoteAddr, ":")[0]
 		jsonB, _ := os.ReadFile("./jdocs/botSdkInfo.json")
