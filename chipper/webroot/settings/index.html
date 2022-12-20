@@ -50,10 +50,11 @@
 			<p>Would you like to setup Knowledge Graph ("I have a question")? This involves creating a free account at <a href="https://houndify.com/" target="_blank">houndify.com</a> and entering a Client Key and Client ID for one of your domains.<br /> Note: It may look like you only get a trial, but there is an actual free tier with 100 free requests per day.<br />This is optional.</p>			
             <label for="knowledgeSettings">Do you want to setup Knowledge Graph?:</label>
 			<select onchange="showHoundForm()" name="knowledgeSettings" id="knowledgeSettings" form="knowledgeSettings">
-				<option value="houndify_no">No</option>
-				<option value="houndify_yes">Yes</option>
+				<option value="knowledge_no">No</option>
+				<option value="knowledge_openai">OpenAI</option>
+				<option value="knowledge_houndify">Houndify</option>
 			</select><br>
-            <div id="houndifyInput"></div>		
+            <div id="knowledgeInput"></div>		
         </form>
         <button onclick="setupPod()">Setup wire-pod</button>
 		<hr>

@@ -33,17 +33,23 @@ var srv *grpcserver.Server
 var grpcIsRunning bool = false
 
 type chipperConfigStruct struct {
-	Port           string `json:"port"`
-	Cert           string `json:"cert"`
-	Key            string `json:"key"`
-	WeatherEnable  string `json:"weatherEnable"`
-	WeatherKey     string `json:"weatherKey"`
-	WeatherUnit    string `json:"weatherUnit"`
+	Port              string `json:"port"`
+	Cert              string `json:"cert"`
+	Key               string `json:"key"`
+	WeatherEnable     string `json:"weatherEnable"`
+	WeatherKey        string `json:"weatherKey"`
+	WeatherUnit       string `json:"weatherUnit"`
+	KnowledgeEnable   string `json:"knowledgeEnable"`
+	KnowledgeProvider string `json:"knowledgeProvider"`
+	KnowledgeID       string `json:"knowledgeID"`
+	KnowledgeKey      string `json:"knowledgeKey"`
+	// begin deprecation
 	HoundifyEnable string `json:"houndifyEnable"`
 	HoundifyKey    string `json:"houndifyKey"`
 	HoundifyID     string `json:"houndifyID"`
-	SttService     string `json:"sttService"`
-	PicovoiceKey   string `json:"picovoiceKey"`
+	// end deprecation
+	SttService   string `json:"sttService"`
+	PicovoiceKey string `json:"picovoiceKey"`
 }
 
 func chipperAPIHandler(w http.ResponseWriter, r *http.Request) {
@@ -84,9 +90,15 @@ func chipperAPIHandler(w http.ResponseWriter, r *http.Request) {
 		weatherEnable := r.FormValue("weatherEnable")
 		weatherKey := r.FormValue("weatherKey")
 		weatherUnit := r.FormValue("weatherUnit")
+		knowledgeEnable := r.FormValue("knowledgeEnable")
+		knowledgeProvider := r.FormValue("knowledgeProvider")
+		knowledgeID := r.FormValue("knowledgeID")
+		knowledgeKey := r.FormValue("knowledgeKey")
+		// begin deprecation
 		houndifyEnable := r.FormValue("houndifyEnable")
 		houndifyKey := r.FormValue("houndifyKey")
 		houndifyID := r.FormValue("houndifyID")
+		// end deprecation
 		sttService := r.FormValue("sttService")
 		picovoiceKey := r.FormValue("picovoiceKey")
 		var chipperConfigReq chipperConfigStruct
@@ -106,12 +118,18 @@ func chipperAPIHandler(w http.ResponseWriter, r *http.Request) {
 			chipperConfigReq.Cert = "../certs/cert.crt"
 			chipperConfigReq.Key = "../certs/cert.key"
 		}
+		if houndifyEnable != "" {
+			logger.Logger("HoundifyEnable found in make config request, erroring")
+			fmt.Fprintf("failed: Your version of the webapp is too old, refresh it with CTRL + SHIFT + R and try again")
+			return
+		}
 		chipperConfigReq.WeatherEnable = weatherEnable
 		chipperConfigReq.WeatherKey = weatherKey
 		chipperConfigReq.WeatherUnit = weatherUnit
-		chipperConfigReq.HoundifyEnable = houndifyEnable
-		chipperConfigReq.HoundifyKey = houndifyKey
-		chipperConfigReq.HoundifyID = houndifyID
+		chipperConfigReq.KnowledgeEnable = knowledgeEnable
+		chipperConfigReq.KnowledgeProvider = knowledgeProvider
+		chipperConfigReq.KnowledgeKey = knowledgeKey
+		chipperConfigReq.KnowledgeID = knowledgeID
 		chipperConfigReq.SttService = sttService
 		chipperConfigReq.PicovoiceKey = picovoiceKey
 		chipperConfigBytes, _ := json.Marshal(chipperConfigReq)
@@ -242,9 +260,18 @@ func startServer() {
 		os.Setenv("WEATHERAPI_KEY", chipperConfig.WeatherKey)
 		os.Setenv("WEATHERAPI_PROVIDER", "openweathermap.org")
 		os.Setenv("WEATHERAPI_UNIT", chipperConfig.WeatherUnit)
-		os.Setenv("HOUNDIFY_ENABLED", chipperConfig.HoundifyEnable)
-		os.Setenv("HOUNDIFY_CLIENT_KEY", chipperConfig.HoundifyKey)
-		os.Setenv("HOUNDIFY_CLIENT_ID", chipperConfig.HoundifyID)
+		if chipperConfig.HoundifyEnable != "" {
+			logger.Logger("Deprecation notice: please configure chipper again")
+			os.Setenv("KNOWLEDGE_ENABLED", chipperConfig.HoundifyEnable)
+			os.Setenv("KNOWLEDGE_PROVIDER", "houndify")
+			os.Setenv("KNOWLEDGE_KEY", chipperConfig.HoundifyKey)
+			os.Setenv("KNOWLEDGE_ID", chipperConfig.HoundifyID)
+		} else {
+			os.Setenv("KNOWLEDGE_ENABLED", chipperConfig.KnowledgeEnable)
+			os.Setenv("KNOWLEDGE_PROVIDER", chipperConfig.KnowledgeProvider)
+			os.Setenv("KNOWLEDGE_KEY", chipperConfig.KnowledgeKey)
+			os.Setenv("KNOWLEDGE_ID", chipperConfig.KnowledgeID)
+		}
 		os.Setenv("DEBUG_LOGGING", "true")
 		os.Setenv("STT_SERVICE", chipperConfig.SttService)
 		os.Setenv("PICOVOICE_APIKEY", chipperConfig.PicovoiceKey)
