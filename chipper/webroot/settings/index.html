@@ -47,13 +47,18 @@
 			</select><br>
             <div id="weatherAPIInput"></div>
 			<h3>Knowledge Graph</h3>
-			<p>Would you like to setup Knowledge Graph ("I have a question")? This involves creating a free account at <a href="https://houndify.com/" target="_blank">houndify.com</a> and entering a Client Key and Client ID for one of your domains.<br /> Note: It may look like you only get a trial, but there is an actual free tier with 100 free requests per day.<br />This is optional.</p>			
+			<p>Would you like to setup Knowledge Graph ("I have a question")?</p>
+			<p>OpenAI: This involves creating an account at <a href="https://beta.openai.com/signup">openai.com</a>, generating an API key, and entering it at this page.</p>
+			<small>Using OpenAI allows you to enable the Intent Graph feature, which makes it so if the speech isn't understood by wire-pod, it gets sent to OpenAI and the bot says the response from there instead.</small>
+			<p>Houndify: This involves creating a free account at <a href="https://houndify.com/" target="_blank">houndify.com</a> and entering a Client Key and Client ID for one of your domains.</p>
+			<p>This is optional.</p>			
             <label for="knowledgeSettings">Do you want to setup Knowledge Graph?:</label>
-			<select onchange="showHoundForm()" name="knowledgeSettings" id="knowledgeSettings" form="knowledgeSettings">
-				<option value="houndify_no">No</option>
-				<option value="houndify_yes">Yes</option>
+			<select onchange="showKnowledgeForm()" name="knowledgeSettings" id="knowledgeSettings" form="knowledgeSettings">
+				<option value="knowledge_no">No</option>
+				<option value="knowledge_openai">OpenAI</option>
+				<option value="knowledge_houndify">Houndify</option>
 			</select><br>
-            <div id="houndifyInput"></div>		
+            <div id="knowledgeInput"></div>
         </form>
         <button onclick="setupPod()">Setup wire-pod</button>
 		<hr>
