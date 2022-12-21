@@ -36,7 +36,7 @@ function showPicovoiceForm() {
     }
 }
 
-function showHoundForm() {
+function showKnowledgeForm() {
     var idLabel = document.createElement("label")
     idLabel.innerHTML = "Enter your Client ID here: "
     idLabel.htmlFor = "knowledgeID";
@@ -52,24 +52,74 @@ function showHoundForm() {
     keyForm.type = "text"
     keyForm.id = "knowledgeKey"
     keyForm.name = "knowledgeKey"
+
+    var openAiKeyLabel = document.createElement("label")
+    openAiKeyLabel.innerHTML = "Enter your OpenAI API key here: "
+    openAiKeyLabel.htmlFor = "openaiKey";
+    var openAiKeykeyForm = document.createElement("input")
+    openAiKeykeyForm.type = "text"
+    openAiKeykeyForm.id = "openaiKey"
+    openAiKeykeyForm.name = "openaiKey"
+
+    var graphLabel = document.createElement("label")
+    graphLabel.innerHTML = "Would you like to enable the intent graph feature?: "
+    graphLabel.htmlFor = "intentGraphSelect";
+    var graphLabelYes = document.createElement("label")
+    graphLabelYes.innerHTML = "Yes"
+    graphLabelYes.htmlFor = "intentGraphYes";
+    var graphLabelNo = document.createElement("label")
+    graphLabelNo.innerHTML = "No"
+    graphLabelNo.htmlFor = "intentGraphNo";
+    var intentGraph = document.createElement("form")
+    intentGraph.id = "intentGraphSelect"
+    intentGraph.name = "intentGraphSelect"
+
+    var intentYes = document.createElement("INPUT");
+    intentYes.setAttribute("type", "radio");
+    intentYes.value = "true"
+    intentYes.name = "intentGraphSelect"
+    intentYes.id = "intentGraphYes"
+    intentYes.form = "intentGraphSelect"
+    intentYes.checked = true
+
+    var intentNo = document.createElement("INPUT");
+    intentNo.setAttribute("type", "radio");
+    intentNo.form = "intentGraphSelect"
+    intentNo.name = "intentGraphSelect"
+    intentNo.id = "intentGraphNo"
+    intentNo.value = "false"
+    intentNo.checked = false
+    intentGraph.appendChild(graphLabelYes)
+    intentGraph.appendChild(intentYes)
+    intentGraph.appendChild(document.createElement("br"))
+    intentGraph.appendChild(graphLabelNo)
+    intentGraph.appendChild(intentNo)
+
     knowledgeSelect = document.getElementById("knowledgeSettings")
-    knowledgeKeyDiv = document.getElementById("houndifyInput")
-    if (knowledgeSelect.value == "houndify_yes") {
+    knowledgeKeyDiv = document.getElementById("knowledgeInput")
+    if (knowledgeSelect.value == "knowledge_houndify") {
         knowledgeKeyDiv.innerHTML = ""
         knowledgeKeyDiv.appendChild(idLabel)
         knowledgeKeyDiv.appendChild(idForm)
         knowledgeKeyDiv.appendChild(keyLabel)
         knowledgeKeyDiv.appendChild(keyForm)
+    } else if (knowledgeSelect.value == "knowledge_openai") {
+        knowledgeKeyDiv.innerHTML = ""
+        knowledgeKeyDiv.appendChild(openAiKeyLabel)
+        knowledgeKeyDiv.appendChild(openAiKeykeyForm)
+        knowledgeKeyDiv.appendChild(graphLabel)
+        knowledgeKeyDiv.appendChild(intentGraph)
     } else {
         knowledgeKeyDiv.innerHTML = ""
     }
 }
 
 function setupPod() {
-    var houndSend = "false"
+    var knowledgeSend = "false"
     var weatherSend = "false"
     var certSend = "ip"
     var portSend = "443"
+    var graphSetup = "false"
     var hostnameValue = document.getElementById("hostnameSettings").value
     var weatherValue = document.getElementById("weatherSettings").value
     var weatherKey = ""
@@ -77,8 +127,9 @@ function setupPod() {
     var sttValue = document.getElementById("sttSettings").value
     var sttSend = ""
     var picovoiceKey = ""
-    var houndID = ""
-    var houndKey = ""
+    var knowledgeID = ""
+    var knowledgeKey = ""
+    var knowledgeProvider = ""
     if (weatherValue == "weather_yes") {
         weatherKey = document.getElementById("weatherKey").value
         weatherSend = "true"
@@ -87,14 +138,24 @@ function setupPod() {
             return
         }
     }
-    if (houndValue == "houndify_yes") {
-        houndID = document.getElementById("knowledgeID").value
-        houndKey = document.getElementById("knowledgeKey").value
-        houndSend = "true"
-        if (houndID == "" || houndKey == "") {
+    if (houndValue == "knowledge_houndify") {
+        knowledgeID = document.getElementById("knowledgeID").value
+        knowledgeKey = document.getElementById("knowledgeKey").value
+        knowledgeSend = "true"
+        knowledgeProvider = "houndify"
+        if (knowledgeID == "" || knowledgeKey == "") {
             alert("You must enter a Houndify client ID and key, or disable knowledge graph.")
             return
         }
+    } else if (houndValue == "knowledge_openai") {
+        knowledgeKey = document.getElementById("openaiKey").value
+        knowledgeSend = "true"
+        knowledgeProvider = "openai"
+        if (knowledgeKey == "") {
+            alert("You must enter an OpenAI API key, or disable knowledge graph.")
+            return
+        }
+        graphSetup = document.getElementById("intentGraphYes").value
     }
     if (sttValue == "picovoice_leopard") {
         picovoiceKey = document.getElementById("picovoiceKey").value
@@ -111,7 +172,7 @@ function setupPod() {
     if (hostnameValue == "escapepod_local"){
         certSend = "epod"
     }
-    var sendString = "?port=" + portSend + "&certType=" + certSend + "&weatherEnable=" + weatherSend + "&weatherKey=" + weatherKey + "&houndifyEnable=" + houndSend + "&houndifyID=" + houndID + "&houndifyKey=" + houndKey + "&sttService=" + sttSend + "&picovoiceKey=" + picovoiceKey
+    var sendString = "?port=" + portSend + "&certType=" + certSend + "&weatherEnable=" + weatherSend + "&weatherKey=" + weatherKey + "&knowledgeEnable=" + knowledgeSend + "&knowledgeID=" + knowledgeID + "&knowledgeKey=" + knowledgeKey + "&knowledgeProvider=" + knowledgeProvider + "&knowledgeIntent=" + graphSetup + "&sttService=" + sttSend + "&picovoiceKey=" + picovoiceKey
     console.log(sendString)
     let xhr = new XMLHttpRequest();
     xhr.open("GET", "/chipper/make_config" + sendString);

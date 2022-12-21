@@ -33,23 +33,23 @@ var srv *grpcserver.Server
 var grpcIsRunning bool = false
 
 type chipperConfigStruct struct {
-	Port              string `json:"port"`
-	Cert              string `json:"cert"`
-	Key               string `json:"key"`
-	WeatherEnable     string `json:"weatherEnable"`
-	WeatherKey        string `json:"weatherKey"`
-	WeatherUnit       string `json:"weatherUnit"`
-	KnowledgeEnable   string `json:"knowledgeEnable"`
-	KnowledgeProvider string `json:"knowledgeProvider"`
-	KnowledgeID       string `json:"knowledgeID"`
-	KnowledgeKey      string `json:"knowledgeKey"`
-	// begin deprecation
+	Port                 string `json:"port"`
+	Cert                 string `json:"cert"`
+	Key                  string `json:"key"`
+	WeatherEnable        string `json:"weatherEnable"`
+	WeatherKey           string `json:"weatherKey"`
+	WeatherUnit          string `json:"weatherUnit"`
+	KnowledgeEnable      string `json:"knowledgeEnable"`
+	KnowledgeProvider    string `json:"knowledgeProvider"`
+	KnowledgeID          string `json:"knowledgeID"`
+	KnowledgeKey         string `json:"knowledgeKey"`
+	KnowledgeIntentGraph string `json:"knowledgeGraph"`
+	// Houndify* is deprecated
 	HoundifyEnable string `json:"houndifyEnable"`
 	HoundifyKey    string `json:"houndifyKey"`
 	HoundifyID     string `json:"houndifyID"`
-	// end deprecation
-	SttService   string `json:"sttService"`
-	PicovoiceKey string `json:"picovoiceKey"`
+	SttService     string `json:"sttService"`
+	PicovoiceKey   string `json:"picovoiceKey"`
 }
 
 func chipperAPIHandler(w http.ResponseWriter, r *http.Request) {
@@ -94,10 +94,9 @@ func chipperAPIHandler(w http.ResponseWriter, r *http.Request) {
 		knowledgeProvider := r.FormValue("knowledgeProvider")
 		knowledgeID := r.FormValue("knowledgeID")
 		knowledgeKey := r.FormValue("knowledgeKey")
+		knowledgeIntent := r.FormValue("knowledgeIntent")
 		// begin deprecation
 		houndifyEnable := r.FormValue("houndifyEnable")
-		houndifyKey := r.FormValue("houndifyKey")
-		houndifyID := r.FormValue("houndifyID")
 		// end deprecation
 		sttService := r.FormValue("sttService")
 		picovoiceKey := r.FormValue("picovoiceKey")
@@ -119,8 +118,8 @@ func chipperAPIHandler(w http.ResponseWriter, r *http.Request) {
 			chipperConfigReq.Key = "../certs/cert.key"
 		}
 		if houndifyEnable != "" {
-			logger.Logger("HoundifyEnable found in make config request, erroring")
-			fmt.Fprintf("failed: Your version of the webapp is too old, refresh it with CTRL + SHIFT + R and try again")
+			logger.Logger("houndifyEnable found in make config request, erroring")
+			fmt.Fprintf(w, "failed: Your version of the webapp is too old, refresh it with CTRL + SHIFT + R and try again")
 			return
 		}
 		chipperConfigReq.WeatherEnable = weatherEnable
@@ -132,6 +131,7 @@ func chipperAPIHandler(w http.ResponseWriter, r *http.Request) {
 		chipperConfigReq.KnowledgeID = knowledgeID
 		chipperConfigReq.SttService = sttService
 		chipperConfigReq.PicovoiceKey = picovoiceKey
+		chipperConfigReq.KnowledgeIntentGraph = knowledgeIntent
 		chipperConfigBytes, _ := json.Marshal(chipperConfigReq)
 		os.WriteFile("./chipperConfig.json", chipperConfigBytes, 0644)
 		fmt.Fprintf(w, "chipper config created")
@@ -261,13 +261,31 @@ func startServer() {
 		os.Setenv("WEATHERAPI_PROVIDER", "openweathermap.org")
 		os.Setenv("WEATHERAPI_UNIT", chipperConfig.WeatherUnit)
 		if chipperConfig.HoundifyEnable != "" {
-			logger.Logger("Deprecation notice: please configure chipper again")
+			logger.Logger("Old config version found, updating")
 			os.Setenv("KNOWLEDGE_ENABLED", chipperConfig.HoundifyEnable)
-			os.Setenv("KNOWLEDGE_PROVIDER", "houndify")
-			os.Setenv("KNOWLEDGE_KEY", chipperConfig.HoundifyKey)
-			os.Setenv("KNOWLEDGE_ID", chipperConfig.HoundifyID)
+			chipperConfig.KnowledgeEnable = chipperConfig.HoundifyEnable
+			chipperConfig.KnowledgeIntentGraph = "false"
+			if chipperConfig.HoundifyEnable == "true" {
+				os.Setenv("KNOWLEDGE_PROVIDER", "houndify")
+				os.Setenv("KNOWLEDGE_KEY", chipperConfig.HoundifyKey)
+				os.Setenv("KNOWLEDGE_ID", chipperConfig.HoundifyID)
+				chipperConfig.KnowledgeProvider = "houndify"
+				chipperConfig.KnowledgeIntentGraph = "false"
+				chipperConfig.KnowledgeID = chipperConfig.HoundifyID
+				chipperConfig.KnowledgeKey = chipperConfig.HoundifyKey
+				chipperConfig.HoundifyID = ""
+				chipperConfig.HoundifyKey = ""
+				chipperConfig.HoundifyEnable = ""
+			}
+			bytes, err := json.Marshal(chipperConfig)
+			logger.Logger("Updated json: " + string(bytes))
+			if err != nil {
+				logger.Logger(err)
+			}
+			os.WriteFile("./chipperConfig.json", bytes, 0644)
 		} else {
 			os.Setenv("KNOWLEDGE_ENABLED", chipperConfig.KnowledgeEnable)
+			os.Setenv("KNOWLEDGE_INTENT_GRAPH", chipperConfig.KnowledgeIntentGraph)
 			os.Setenv("KNOWLEDGE_PROVIDER", chipperConfig.KnowledgeProvider)
 			os.Setenv("KNOWLEDGE_KEY", chipperConfig.KnowledgeKey)
 			os.Setenv("KNOWLEDGE_ID", chipperConfig.KnowledgeID)
