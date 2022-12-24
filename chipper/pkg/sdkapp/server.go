@@ -278,12 +278,14 @@ func setSettingSDKintbool(setting string, value string) {
 	}
 }
 
-type RobotSDKInfoStore struct {
+type RobotInfoStore struct {
 	GlobalGUID string `json:"global_guid"`
 	Robots     []struct {
 		Esn       string `json:"esn"`
 		IPAddress string `json:"ip_address"`
+		// 192.168.1.150:443
 		GUID      string `json:"guid"`
+		Activated bool   `json:"activated"`
 	} `json:"robots"`
 }
 
@@ -311,7 +313,7 @@ func NewWP(serial string, useGlobal bool) (*vector.Vector, error) {
 		log.Println("vector-go-sdk error: Error opening " + "jdocs/botSdkInfo.json" + ", likely doesn't exist")
 		return nil, err
 	}
-	var robotSDKInfo RobotSDKInfoStore
+	var robotSDKInfo RobotInfoStore
 	json.Unmarshal(jsonBytes, &robotSDKInfo)
 	matched := false
 	for _, robot := range robotSDKInfo.Robots {
@@ -523,6 +525,51 @@ func SdkapiHandler(w http.ResponseWriter, r *http.Request) {
 		moveHead(float32(speed))
 		fmt.Fprintf(w, "")
 		return
+	case r.URL.Path == "/api-sdk/get_faces":
+		resp, err := robot.Conn.RequestEnrolledNames(
+			ctx,
+			&vectorpb.RequestEnrolledNamesRequest{})
+		if err != nil {
+			fmt.Fprintf(w, err.Error())
+			return
+		}
+		bytes, _ := json.Marshal(resp.Faces)
+		fmt.Fprintf(w, string(bytes))
+		return
+	case r.URL.Path == "/api-sdk/rename_face":
+		id := r.FormValue("id")
+		oldname := r.FormValue("oldname")
+		newname := r.FormValue("newname")
+		idInt, _ := strconv.Atoi(id)
+		idInt32 := int32(idInt)
+		_, err := robot.Conn.UpdateEnrolledFaceByID(
+			ctx,
+			&vectorpb.UpdateEnrolledFaceByIDRequest{
+				FaceId:  idInt32,
+				OldName: oldname,
+				NewName: newname,
+			})
+		if err != nil {
+			fmt.Fprintf(w, err.Error())
+			return
+		}
+		fmt.Fprintf(w, "success")
+		return
+	case r.URL.Path == "/api-sdk/delete_face":
+		id := r.FormValue("id")
+		idInt, _ := strconv.Atoi(id)
+		idInt32 := int32(idInt)
+		_, err := robot.Conn.EraseEnrolledFaceByID(
+			ctx,
+			&vectorpb.EraseEnrolledFaceByIDRequest{
+				FaceId: idInt32,
+			})
+		if err != nil {
+			fmt.Fprintf(w, err.Error())
+			return
+		}
+		fmt.Fprintf(w, "success")
+		return
 	case r.URL.Path == "/api-sdk/mirror_mode":
 		enable := r.FormValue("enable")
 		if enable == "true" {
@@ -583,6 +630,7 @@ func BeginServer() {
 	http.Handle("/stream", camStream)
 	// in jdocspinger.go
 	http.HandleFunc("/ok:80", connCheck)
+	http.HandleFunc("/link-esn-and-target", connCheck)
 	logger.Logger("Starting SDK app")
 
 	fmt.Printf("Starting server at port 80 for connCheck\n")

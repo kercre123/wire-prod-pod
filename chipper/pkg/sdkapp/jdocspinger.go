@@ -8,8 +8,10 @@ import (
 	"strings"
 	"time"
 
+	"github.com/digital-dream-labs/chipper/pkg/jdocsserver"
 	"github.com/digital-dream-labs/chipper/pkg/logger"
 	"github.com/fforchino/vector-go-sdk/pkg/vectorpb"
+	"github.com/go-ping/ping"
 )
 
 // the big workaround
@@ -22,13 +24,13 @@ import (
 func pingJdocs(target string) {
 	target = strings.Split(target, ":")[0]
 	var serial string
-	jsonBytes, err := os.ReadFile("jdocs/botSdkInfo.json")
+	jsonBytes, err := os.ReadFile(jdocsserver.InfoPath)
 	if err != nil {
-		logger.Logger("Error opening " + "jdocs/botSdkInfo.json" + ", this bot likely hasn't been authed")
+		logger.Logger("Error opening " + jdocsserver.InfoPath + ", this bot likely hasn't been authed")
 		logger.Logger("Error pinging jdocs")
 		return
 	}
-	var robotSDKInfo RobotSDKInfoStore
+	var robotSDKInfo RobotInfoStore
 	json.Unmarshal(jsonBytes, &robotSDKInfo)
 	matched := false
 	for _, robot := range robotSDKInfo.Robots {
@@ -61,18 +63,22 @@ func pingJdocs(target string) {
 		robotGUID = robotTmp.Cfg.Token
 		_, err = robotTmp.Conn.BatteryState(ctx, &vectorpb.BatteryStateRequest{})
 		if err != nil {
-			logger.Logger(err)
-			logger.Logger("Error pinging jdocs")
+			logger.Logger("Error pinging jdocs, likely unauthenticated")
 			return
 		}
 	}
-	_, err = robotTmp.Conn.PullJdocs(ctx, &vectorpb.PullJdocsRequest{
+	resp, err := robotTmp.Conn.PullJdocs(ctx, &vectorpb.PullJdocsRequest{
 		JdocTypes: []vectorpb.JdocType{vectorpb.JdocType_ROBOT_SETTINGS},
 	})
 	if err != nil {
+		logger.Logger(err)
+		logger.Logger("Failed to pull jdocs")
 		return
 	}
 	logger.Logger("Successfully got jdocs from " + serial)
+	// write to file
+	writeBytes, _ := json.Marshal(resp.NamedJdocs[0].Doc)
+	os.WriteFile("./jdocs/vic:"+serial+"-vic.RobotSettings.json", writeBytes, 0644)
 	return
 }
 
@@ -144,7 +150,7 @@ func connCheck(w http.ResponseWriter, r *http.Request) {
 		//	logger.Logger("connCheck request from " + r.RemoteAddr)
 		robotTarget := strings.Split(r.RemoteAddr, ":")[0] + ":443"
 		robotTargetCheck := strings.Split(r.RemoteAddr, ":")[0]
-		jsonB, _ := os.ReadFile("./jdocs/botSdkInfo.json")
+		jsonB, _ := os.ReadFile(jdocsserver.InfoPath)
 		json := string(jsonB)
 		if strings.Contains(json, strings.TrimSpace(robotTargetCheck)) {
 			ping := jdocsPingTimer(robotTarget)
@@ -153,6 +159,31 @@ func connCheck(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 		fmt.Fprintf(w, "ok")
+		return
+	case r.URL.Path == "/link-esn-and-target":
+		esn := r.FormValue("esn")
+		target := r.FormValue("target")
+		logger.Logger(len([]rune(esn)))
+		if len([]rune(esn)) != 8 {
+			fmt.Fprintf(w, "failed to link bot: Serial number should equal 8 characters")
+			return
+		}
+		pinger, err := ping.NewPinger(target)
+		pinger.SetPrivileged(true)
+		if err != nil {
+			fmt.Fprintf(w, "failed to link bot: IP address not valid")
+			return
+		}
+		pinger.Count = 1
+		pinger.Timeout = time.Second * 2
+		err = pinger.Run()
+		if err != nil {
+			logger.Logger(err)
+			fmt.Fprintf(w, "failed to link bot: Couldn't ping bot, make sure you have entered the correct ip address")
+			return
+		}
+		jdocsserver.StoreBotInfoStrings(target, esn)
+		fmt.Fprintf(w, "success")
 		return
 	}
 }
