@@ -154,7 +154,7 @@ func chipperAPIHandler(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 			ipAddr := strings.TrimSpace(string(ipAddrBytes))
-			serverConfig = `{"jdocs": "` + ipAddr + `:` + os.Getenv("DDL_RPC_PORT") + `", "tms": "` + ipAddr + `:` + os.Getenv("DDL_RPC_PORT") + `", "chipper": "` + ipAddr + `/ok:80` + `", "` + ipAddr + `:` + os.Getenv("DDL_RPC_PORT") + `", "logfiles": "s3://anki-device-logs-prod/victor", "appkey": "oDoa0quieSeir6goowai7f"}`
+			serverConfig = `{"jdocs": "` + ipAddr + `:` + os.Getenv("DDL_RPC_PORT") + `", "tms": "` + ipAddr + `:` + os.Getenv("DDL_RPC_PORT") + `", "chipper": "` + ipAddr + `:` + os.Getenv("DDL_RPC_PORT") + `", "check": "` + ipAddr + `/ok:80` + `", "logfiles": "s3://anki-device-logs-prod/victor", "appkey": "oDoa0quieSeir6goowai7f"}`
 		}
 		exec.Command("/bin/mkdir", "-p", "../certs").Run()
 		os.WriteFile("../certs/server_config.json", []byte(serverConfig), 0644)
