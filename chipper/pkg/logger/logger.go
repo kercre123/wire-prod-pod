@@ -8,7 +8,7 @@ import (
 var LogList string
 var LogArray []string
 
-func Logger(a ...any) {
+func Println(a ...any) {
 	fmt.Println(a...)
 	LogArray = append(LogArray, time.Now().Format("2006.01.02 15:04:05")+": "+fmt.Sprint(a...)+"\n")
 	if len(LogArray) >= 30 {
