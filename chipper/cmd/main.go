@@ -146,7 +146,7 @@ func chipperAPIHandler(w http.ResponseWriter, r *http.Request) {
 		botIP := r.FormValue("botIP")
 		var serverConfig string
 		if _, err := os.Stat("./useepod"); err == nil {
-			serverConfig = `{"jdocs": "jdocs.api.anki.com:443", "tms": "token.api.anki.com:443", "chipper": "escapepod.local:443", "check": "conncheck.global.anki-services.com/ok", "logfiles": "s3://anki-device-logs-prod/victor", "appkey": "oDoa0quieSeir6goowai7f"}`
+			serverConfig = `{"jdocs": "escapepod.local:443", "tms": "escapepod.local:443", "chipper": "escapepod.local:443", "check": "escapepod.local/ok:80", "logfiles": "s3://anki-device-logs-prod/victor", "appkey": "oDoa0quieSeir6goowai7f"}`
 		} else {
 			ipAddrBytes, err := os.ReadFile("../certs/address")
 			if err != nil {
@@ -154,7 +154,7 @@ func chipperAPIHandler(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 			ipAddr := strings.TrimSpace(string(ipAddrBytes))
-			serverConfig = `{"jdocs": "jdocs.api.anki.com:443", "tms": "token.api.anki.com:443", "chipper": "` + ipAddr + `:` + os.Getenv("DDL_RPC_PORT") + `", "check": "conncheck.global.anki-services.com/ok", "logfiles": "s3://anki-device-logs-prod/victor", "appkey": "oDoa0quieSeir6goowai7f"}`
+			serverConfig = `{"jdocs": "` + ipAddr + `:` + os.Getenv("DDL_RPC_PORT") + `", "tms": "` + ipAddr + `:` + os.Getenv("DDL_RPC_PORT") + `", "chipper": "` + ipAddr + `/ok:80` + `", "` + ipAddr + `:` + os.Getenv("DDL_RPC_PORT") + `", "logfiles": "s3://anki-device-logs-prod/victor", "appkey": "oDoa0quieSeir6goowai7f"}`
 		}
 		exec.Command("/bin/mkdir", "-p", "../certs").Run()
 		os.WriteFile("../certs/server_config.json", []byte(serverConfig), 0644)

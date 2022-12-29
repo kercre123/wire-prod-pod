@@ -242,6 +242,7 @@ function setupBot() {
     req.open("POST", "/chipper/upload_ssh_key");
     req.send(formData);
     let xhr = new XMLHttpRequest();
+    alert("Your bot is going to be set up. This will put Vector back into Onboarding mode, but will not clear user data. This may take up to a minute. Press OK to begin the process.")
     xhr.open("GET", "/chipper/setup_bot" + "?botIP=" + document.getElementById("botIP").value);
     xhr.setRequestHeader("Cache-Control", "no-cache, no-store, max-age=0");
     xhr.send();
@@ -252,7 +253,7 @@ function setupBot() {
             alert("Unable to communicate with robot. The key may be invalid, the bot may not be unlocked, or this device and the robot are not on the same network.")
             return
         } else if (responseString.includes("Everything")) {
-            alert("Success! Voice commands should now be working with your bot.")
+            alert("Success! Use https://keriganc.com/vector-epod-setup on any device to finish setting up your bot.")
             return
         } else {
             alert("Error: " + responseString)
