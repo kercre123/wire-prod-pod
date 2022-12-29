@@ -46,17 +46,20 @@
 		echo "Unable to communicate with robot. The key may be invalid, the bot may not be unlocked, or this device and the robot are not on the same network."
 		exit 0
 	fi
-	ssh -oStrictHostKeyChecking=no -i ${keyPath} root@${botAddress} "mount -o rw,remount / && systemctl stop vic-cloud && mv /anki/data/assets/cozmo_resources/config/server_config.json /anki/data/assets/cozmo_resources/config/server_config.json.bak"
-	scp -oStrictHostKeyChecking=no ${oldVar} -i ${keyPath} ../vector-cloud/build/vic-cloud root@${botAddress}:/anki/bin/
-	scp -oStrictHostKeyChecking=no ${oldVar} -i ${keyPath} ../certs/server_config.json root@${botAddress}:/anki/data/assets/cozmo_resources/config/
-	if [[ -f ./useepod ]]; then
-		scp ${oldVar} -i ${keyPath} ./epod/ep.crt root@${botAddress}:/data/data/customCaCert.crt
-	else
-		scp ${oldVar} -i ${keyPath} ../certs/cert.crt root@${botAddress}:/data/data/customCaCert.crt
-	fi
-	ssh -oStrictHostKeyChecking=no -i ${keyPath} root@${botAddress} "chmod +rwx /anki/data/assets/cozmo_resources/config/server_config.json /anki/bin/vic-cloud /data/data/customCaCert.crt && systemctl start vic-cloud"
-	rm -f /tmp/sshTest
-	rm -f /tmp/scpTest
+    ssh  -oStrictHostKeyChecking=no -i ${keyPath} root@${botAddress} "mount -o rw,remount / && mount -o rw,remount,exec /data && systemctl stop anki-robot.target && mv /anki/data/assets/cozmo_resources/config/server_config.json /anki/data/assets/cozmo_resources/config/server_config.json.bak"
+    scp  -oStrictHostKeyChecking=no ${oldVar} -i ${keyPath} ../vector-cloud/build/vic-cloud root@${botAddress}:/anki/bin/
+    scp  -oStrictHostKeyChecking=no ${oldVar} -i ${keyPath} ../certs/server_config.json root@${botAddress}:/anki/data/assets/cozmo_resources/config/
+    scp  -oStrictHostKeyChecking=no ${oldVar} -i ${keyPath} ../vector-cloud/pod-bot-install.sh root@${botAddress}:/data/
+    if [[ -f ./useepod ]]; then
+        scp -oStrictHostKeyChecking=no ${oldVar} -i ${keyPath} ./epod/ep.crt root@${botAddress}:/anki/etc/wirepod-cert.crt
+        scp -oStrictHostKeyChecking=no ${oldVar} -i ${keyPath} ./epod/ep.crt root@${botAddress}:/data/data/wirepod-cert.crt
+    else
+        scp -oStrictHostKeyChecking=no ${oldVar} -i ${keyPath} ../certs/cert.crt root@${botAddress}:/anki/etc/wirepod-cert.crt
+        scp -oStrictHostKeyChecking=no ${oldVar} -i ${keyPath} ../certs/cert.crt root@${botAddress}:/data/data/wirepod-cert.crt
+    fi
+    ssh -oStrictHostKeyChecking=no -i ${keyPath} root@${botAddress} "chmod +rwx /anki/data/assets/cozmo_resources/config/server_config.json /anki/bin/vic-cloud /data/data/wirepod-cert.crt /anki/etc/wirepod-cert.crt /data/pod-bot-install.sh && /data/pod-bot-install.sh"
+    rm -f /tmp/sshTest
+    rm -f /tmp/scpTest
 	echo
 	echo "Everything has been copied to the bot! Voice commands should work now without needing to reboot Vector."
 	echo

@@ -8,20 +8,16 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
-	"os/signal"
 	"strconv"
 	"strings"
-	"syscall"
 
-	pb "github.com/digital-dream-labs/api/go/chipperpb"
-	jdocspb "github.com/digital-dream-labs/api/go/jdocspb"
-	tokenpb "github.com/digital-dream-labs/api/go/tokenpb"
-	jdocsserver "github.com/digital-dream-labs/chipper/pkg/jdocsserver"
-	"github.com/digital-dream-labs/chipper/pkg/logger"
-	sdkWeb "github.com/digital-dream-labs/chipper/pkg/sdkapp"
-	"github.com/digital-dream-labs/chipper/pkg/server"
-	tokenserver "github.com/digital-dream-labs/chipper/pkg/tokenserver"
-	wirepod "github.com/digital-dream-labs/chipper/pkg/voice_processors"
+	"github.com/kercre123/chipper/pkg/initwirepod"
+	"github.com/kercre123/chipper/pkg/logger"
+	wpweb "github.com/kercre123/chipper/pkg/wirepod/config-ws"
+	sdkWeb "github.com/kercre123/chipper/pkg/wirepod/sdkapp"
+	coqui "github.com/kercre123/chipper/pkg/wirepod/stt/coqui"
+	leopard "github.com/kercre123/chipper/pkg/wirepod/stt/leopard"
+	vosk "github.com/kercre123/chipper/pkg/wirepod/stt/vosk"
 
 	//	grpclog "github.com/digital-dream-labs/hugh/grpc/interceptors/log"
 
@@ -30,7 +26,6 @@ import (
 )
 
 var srv *grpcserver.Server
-var grpcIsRunning bool = false
 
 type chipperConfigStruct struct {
 	Port                 string `json:"port"`
@@ -59,15 +54,15 @@ func chipperAPIHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	case r.URL.Path == "/chipper/start_chipper":
 		//	name := r.FormValue("name")
-		if grpcIsRunning {
+		if initwirepod.ServerRunning {
 			fmt.Fprintf(w, "chipper already running")
 		} else {
-			go startServer()
+			startServer()
 			fmt.Fprintf(w, "chipper started")
 		}
 		return
 	case r.URL.Path == "/chipper/stop_chipper":
-		if !grpcIsRunning {
+		if !initwirepod.ServerRunning {
 			fmt.Fprintf(w, "chipper already stopped")
 		} else {
 			stopServer()
@@ -75,12 +70,12 @@ func chipperAPIHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	case r.URL.Path == "/chipper/restart_chipper":
-		if !grpcIsRunning {
-			go startServer()
+		if !initwirepod.ServerRunning {
+			startServer()
 			fmt.Fprintf(w, "chipper restarted")
 		} else {
 			stopServer()
-			go startServer()
+			startServer()
 			fmt.Fprintf(w, "chipper restarted")
 		}
 		return
@@ -103,7 +98,7 @@ func chipperAPIHandler(w http.ResponseWriter, r *http.Request) {
 		var chipperConfigReq chipperConfigStruct
 		chipperConfigReq.Port = port
 		if strings.Contains(certType, "epod") {
-			logger.Logger("creating useepod")
+			logger.Println("creating useepod")
 			os.WriteFile("./useepod", []byte("true"), 0644)
 			exec.Command("/bin/bash", "../setup.sh", "certs", "epod").Run()
 			chipperConfigReq.Cert = "./epod/ep.crt"
@@ -112,13 +107,13 @@ func chipperAPIHandler(w http.ResponseWriter, r *http.Request) {
 			exec.Command("/bin/rm", "-f", "./useepod").Run()
 			cmdOutput, _ := exec.Command("/bin/bash", "../setup.sh", "certs", "ip").Output()
 			if strings.Contains(string(cmdOutput), "Generating key and cert") {
-				logger.Logger("Successfully generated certs")
+				logger.Println("Successfully generated certs")
 			}
 			chipperConfigReq.Cert = "../certs/cert.crt"
 			chipperConfigReq.Key = "../certs/cert.key"
 		}
 		if houndifyEnable != "" {
-			logger.Logger("houndifyEnable found in make config request, erroring")
+			logger.Println("houndifyEnable found in make config request, erroring")
 			fmt.Fprintf(w, "failed: Your version of the webapp is too old, refresh it with CTRL + SHIFT + R and try again")
 			return
 		}
@@ -151,7 +146,7 @@ func chipperAPIHandler(w http.ResponseWriter, r *http.Request) {
 		botIP := r.FormValue("botIP")
 		var serverConfig string
 		if _, err := os.Stat("./useepod"); err == nil {
-			serverConfig = `{"jdocs": "jdocs.api.anki.com:443", "tms": "token.api.anki.com:443", "chipper": "escapepod.local:443", "check": "conncheck.global.anki-services.com/ok", "logfiles": "s3://anki-device-logs-prod/victor", "appkey": "oDoa0quieSeir6goowai7f"}`
+			serverConfig = `{"jdocs": "escapepod.local:443", "tms": "escapepod.local:443", "chipper": "escapepod.local:443", "check": "escapepod.local/ok:80", "logfiles": "s3://anki-device-logs-prod/victor", "appkey": "oDoa0quieSeir6goowai7f"}`
 		} else {
 			ipAddrBytes, err := os.ReadFile("../certs/address")
 			if err != nil {
@@ -159,7 +154,7 @@ func chipperAPIHandler(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 			ipAddr := strings.TrimSpace(string(ipAddrBytes))
-			serverConfig = `{"jdocs": "jdocs.api.anki.com:443", "tms": "token.api.anki.com:443", "chipper": "` + ipAddr + `:` + os.Getenv("DDL_RPC_PORT") + `", "check": "conncheck.global.anki-services.com/ok", "logfiles": "s3://anki-device-logs-prod/victor", "appkey": "oDoa0quieSeir6goowai7f"}`
+			serverConfig = `{"jdocs": "` + ipAddr + `:` + os.Getenv("DDL_RPC_PORT") + `", "tms": "` + ipAddr + `:` + os.Getenv("DDL_RPC_PORT") + `", "chipper": "` + ipAddr + `/ok:80` + `", "` + ipAddr + `:` + os.Getenv("DDL_RPC_PORT") + `", "logfiles": "s3://anki-device-logs-prod/victor", "appkey": "oDoa0quieSeir6goowai7f"}`
 		}
 		exec.Command("/bin/mkdir", "-p", "../certs").Run()
 		os.WriteFile("../certs/server_config.json", []byte(serverConfig), 0644)
@@ -178,7 +173,6 @@ func chipperAPIHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	go sdkWeb.BeginServer()
 	log.SetJSONFormat("2006-01-02 15:04:05")
 	if os.Getenv("DDL_RPC_PORT") != "" {
 		var chipperConfigReq chipperConfigStruct
@@ -192,7 +186,7 @@ func main() {
 			chipperConfigReq.Cert = "./epod/ep.crt"
 			chipperConfigReq.Key = "./epod/ep.key"
 		} else {
-			logger.Logger("You must use the webserver to define where your certs are.")
+			logger.Println("You must use the webserver to define where your certs are.")
 			shouldStartChipper = false
 		}
 		chipperConfigReq.Port = os.Getenv("DDL_RPC_PORT")
@@ -211,10 +205,11 @@ func main() {
 	} else if _, err := os.Stat("./chipperConfig.json"); err == nil {
 		go startServer()
 	} else {
-		logger.Logger("Use the webserver to setup and start chipper.")
+		logger.Println("Use the webserver to setup and start chipper.")
 	}
 	var webPort string
-	http.HandleFunc("/api/", server.ApiHandler)
+	http.HandleFunc("/api/", wpweb.ApiHandler)
+	go sdkWeb.BeginServer()
 	http.HandleFunc("/chipper/", chipperAPIHandler)
 	fileServer := http.FileServer(http.Dir("./webroot"))
 	http.Handle("/", fileServer)
@@ -222,7 +217,7 @@ func main() {
 		if _, err := strconv.Atoi(os.Getenv("WEBSERVER_PORT")); err == nil {
 			webPort = os.Getenv("WEBSERVER_PORT")
 		} else {
-			logger.Logger("WEBSERVER_PORT contains letters, using default of 8080")
+			logger.Println("WEBSERVER_PORT contains letters, using default of 8080")
 			webPort = "8080"
 		}
 	} else {
@@ -235,9 +230,7 @@ func main() {
 }
 
 func stopServer() {
-	srv.Stop()
-	logger.Logger("Server stopped.")
-	grpcIsRunning = false
+	initwirepod.StopGrpc()
 }
 
 func startServer() {
@@ -261,7 +254,7 @@ func startServer() {
 		os.Setenv("WEATHERAPI_PROVIDER", "openweathermap.org")
 		os.Setenv("WEATHERAPI_UNIT", chipperConfig.WeatherUnit)
 		if chipperConfig.HoundifyEnable != "" {
-			logger.Logger("Old config version found, updating")
+			logger.Println("Old config version found, updating")
 			os.Setenv("KNOWLEDGE_ENABLED", chipperConfig.HoundifyEnable)
 			chipperConfig.KnowledgeEnable = chipperConfig.HoundifyEnable
 			chipperConfig.KnowledgeIntentGraph = "false"
@@ -278,9 +271,9 @@ func startServer() {
 				chipperConfig.HoundifyEnable = ""
 			}
 			bytes, err := json.Marshal(chipperConfig)
-			logger.Logger("Updated json: " + string(bytes))
+			logger.Println("Updated json: " + string(bytes))
 			if err != nil {
-				logger.Logger(err)
+				logger.Println(err)
 			}
 			os.WriteFile("./chipperConfig.json", bytes, 0644)
 		} else {
@@ -294,64 +287,13 @@ func startServer() {
 		os.Setenv("STT_SERVICE", chipperConfig.SttService)
 		os.Setenv("PICOVOICE_APIKEY", chipperConfig.PicovoiceKey)
 	}
-	var err error
-	srv, err = grpcserver.New(
-		grpcserver.WithViper(),
-		grpcserver.WithLogger(log.Base()),
-		grpcserver.WithReflectionService(),
-
-		grpcserver.WithUnaryServerInterceptors(
-		//			grpclog.UnaryServerInterceptor(),
-		),
-
-		grpcserver.WithStreamServerInterceptors(
-		//			grpclog.StreamServerInterceptor(),
-		),
-	)
-	if err != nil {
-		logger.Logger("Something is broken in the voice server config.")
-		logger.Logger("GRPC server error: " + err.Error())
-		logger.Logger("This can be solved via the webserver.")
-		return
-	}
-	p, err := wirepod.New(os.Getenv("STT_SERVICE"))
-	var canGoOn bool = true
-	if err != nil {
-		logger.Logger("Something is broken in the voice server config.")
-		logger.Logger("New wire-pod instance error: " + err.Error())
-		logger.Logger("This can be solved via the webserver.")
-		canGoOn = false
-	}
-
-	if canGoOn {
-		s, _ := server.New(
-			//server.WithLogger(log.Base()),
-			server.WithIntentProcessor(p),
-			server.WithKnowledgeGraphProcessor(p),
-			server.WithIntentGraphProcessor(p),
-		)
-		c := make(chan os.Signal, 1)
-		signal.Notify(c, os.Interrupt, syscall.SIGABRT, syscall.SIGINT, syscall.SIGTERM)
-		go func() {
-			for range c {
-				logger.Logger("Exiting")
-				os.Exit(0)
-			}
-		}()
-
-		tokenServer := tokenserver.NewTokenServer()
-		jdocsServer := jdocsserver.NewJdocsServer()
-
-		pb.RegisterChipperGrpcServer(srv.Transport(), s)
-		logger.Logger("Registering jdocs and token handlers")
-		jdocspb.RegisterJdocsServer(srv.Transport(), jdocsServer)
-		tokenpb.RegisterTokenServer(srv.Transport(), tokenServer)
-
-		srv.Start()
-		logger.Logger("Server started successfully!")
-		grpcIsRunning = true
-		<-srv.Notify(grpcserver.Stopped)
-	} else {
-		logger.Logger("Server failed to start.")
+	if !initwirepod.ServerRunning {
+		if os.Getenv("STT_SERVICE") == "leopard" {
+			initwirepod.StartServer(leopard.Init, leopard.STT, leopard.Name)
+		} else if os.Getenv("STT_SERVICE") == "coqui" {
+			initwirepod.StartServer(coqui.Init, coqui.STT, coqui.Name)
+		} else {
+			initwirepod.StartServer(vosk.Init, vosk.STT, vosk.Name)
+		}
 	}
 }
