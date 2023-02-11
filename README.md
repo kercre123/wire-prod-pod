@@ -6,6 +6,10 @@ This version is designed to be easy to setup by consumers and by people with lit
 
 ***
 
+## deprecation notice
+
+[wire-pod](https://www.github.com/kercre123/wire-pod) is becoming on-par with wire-prod-pod in terms of ease of setup and use, and is much more up-to-date at the moment. Because of this, development of this repo specifically will stop. This repo will likely become a set of wire-pod configuration/installation scripts.
+
 ## Installation
 
 ### Some general notices for production Vectors:
