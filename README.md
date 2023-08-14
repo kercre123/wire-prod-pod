@@ -1,16 +1,8 @@
 # (DEPRECATED) wire-prod-pod
 
-## This repository has been archived. Please use [wire-pod](https://www.github.com/kercre123/wire-pod).
-
-Custom Vector escape pod designed for regular production Vectors. No OSKR required.
-
-This version is designed to be easy to setup by consumers and by people with little technical experience. If you would like a version that is more dev-friendly and customizable, check out [wire-pod](https://www.github.com/kercre123/wire-pod).
+# This repository has been archived!! These instructions are old and this code is old. wire-pod, on the other hand, works great with regular production Vectors, and has more features. Please use [wire-pod](https://www.github.com/kercre123/wire-pod).
 
 ***
-
-## deprecation notice
-
-[wire-pod](https://www.github.com/kercre123/wire-pod) is becoming on-par with wire-prod-pod in terms of ease of setup and use, and is much more up-to-date at the moment. Because of this, development of this repo specifically will stop. This repo will likely become a set of wire-pod configuration/installation scripts.
 
 ## Installation
 
