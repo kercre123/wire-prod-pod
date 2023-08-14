@@ -1,4 +1,6 @@
-# wire-prod-pod
+# (DEPRECATED) wire-prod-pod
+
+## This repository has been archived. Please use [wire-pod](https://www.github.com/kercre123/wire-pod).
 
 Custom Vector escape pod designed for regular production Vectors. No OSKR required.
 
